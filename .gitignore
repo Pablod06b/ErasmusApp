@@ -1,0 +1,23 @@
+# Xcode / Swift
+.build/
+.swiftpm/
+DerivedData/
+build/
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# CocoaPods
+Pods/
+
+# Custom junk from root
+*.log
+build_errors.txt
+analysis.txt
+build_fast.log
+build_output.log
+build_groups*.log
+build_feedback*.log

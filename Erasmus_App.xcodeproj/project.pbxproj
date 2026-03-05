@@ -1,0 +1,1132 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1990289D9168090DDE44183F /* Pods_Erasmus_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DE0DC2E9322612B44F532D7 /* Pods_Erasmus_App.framework */; };
+		2C04199440E5AFA4267621C7 /* GoogleSignInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F64893F4E89ABDB0E65B0C /* GoogleSignInHelper.swift */; };
+		7C520AAF59F1F6D1E8BE375E /* LocationSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A545073930DB66CE5837D48 /* LocationSearchViewModel.swift */; };
+		81959742023FF26D122ACBED /* GroupChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA789B0BF18A7DA9E784F8 /* GroupChatView.swift */; };
+		831C34712EEB9BD700E33724 /* FirebaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C343A2EEB9BD700E33724 /* FirebaseConfig.swift */; };
+		831C34742EEB9BD700E33724 /* ModernCreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34582EEB9BD700E33724 /* ModernCreatePostView.swift */; };
+		831C34772EEB9BD700E33724 /* ModernOnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34462EEB9BD700E33724 /* ModernOnboardingFlow.swift */; };
+		831C34782EEB9BD700E33724 /* CreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34572EEB9BD700E33724 /* CreatePostView.swift */; };
+		831C34792EEB9BD700E33724 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C345A2EEB9BD700E33724 /* UserProfileView.swift */; };
+		831C347A2EEB9BD700E33724 /* LocationMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C346E2EEB9BD700E33724 /* LocationMapView.swift */; };
+		831C347C2EEB9BD700E33724 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34372EEB9BD700E33724 /* ContentView.swift */; };
+		831C347E2EEB9BD700E33724 /* PostCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C346C2EEB9BD700E33724 /* PostCardView.swift */; };
+		831C347F2EEB9BD700E33724 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34472EEB9BD700E33724 /* OnboardingView.swift */; };
+		831C34802EEB9BD700E33724 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C343E2EEB9BD700E33724 /* Models.swift */; };
+		831C34812EEB9BD700E33724 /* Erasmus_AppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34392EEB9BD700E33724 /* Erasmus_AppApp.swift */; };
+		831C34822EEB9BD700E33724 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34512EEB9BD700E33724 /* ChatView.swift */; };
+		831C34832EEB9BD700E33724 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34552EEB9BD700E33724 /* HomeView.swift */; };
+		831C34842EEB9BD700E33724 /* ModernLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34432EEB9BD700E33724 /* ModernLoginView.swift */; };
+		831C34852EEB9BD700E33724 /* ModernSignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34492EEB9BD700E33724 /* ModernSignUpView.swift */; };
+		831C34862EEB9BD700E33724 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C343F2EEB9BD700E33724 /* UserProfile.swift */; };
+		831C34872EEB9BD700E33724 /* PersonCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C346B2EEB9BD700E33724 /* PersonCardView.swift */; };
+		831C34882EEB9BD700E33724 /* EventCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C346A2EEB9BD700E33724 /* EventCardView.swift */; };
+		831C34892EEB9BD700E33724 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C344F2EEB9BD700E33724 /* AuthView.swift */; };
+		831C348A2EEB9BD700E33724 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34422EEB9BD700E33724 /* ForgotPasswordView.swift */; };
+		831C348C2EEB9BD700E33724 /* EntradaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34542EEB9BD700E33724 /* EntradaView.swift */; };
+		831C348D2EEB9BD700E33724 /* ModernOnboardingComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34452EEB9BD700E33724 /* ModernOnboardingComponents.swift */; };
+		831C348E2EEB9BD700E33724 /* Assets 2.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 831C34682EEB9BD700E33724 /* Assets 2.xcassets */; };
+		831C34902EEB9BD700E33724 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 831C345F2EEB9BD700E33724 /* Localizable.strings */; };
+		831C34912EEB9BD700E33724 /* Erasmus_App.json in Resources */ = {isa = PBXBuildFile; fileRef = 831C34382EEB9BD700E33724 /* Erasmus_App.json */; };
+		836D5C412EEE3D8A00C027E4 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836D5C402EEE3D8A00C027E4 /* ChatModels.swift */; };
+		8399C52C2EF43E10001BC9C6 /* Group.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C52B2EF43E10001BC9C6 /* Group.swift */; };
+		8399C52F2EF43E6E001BC9C6 /* ModernBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C52D2EF43E6E001BC9C6 /* ModernBadgeView.swift */; };
+		8399C5332EF43F71001BC9C6 /* GroupDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C5302EF43F71001BC9C6 /* GroupDetailView.swift */; };
+		8399C5342EF43F71001BC9C6 /* GroupJoinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C5312EF43F71001BC9C6 /* GroupJoinView.swift */; };
+		8399C5432EF43FC7001BC9C6 /* EventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C53A2EF43FC7001BC9C6 /* EventManager.swift */; };
+		8399C5442EF43FC7001BC9C6 /* FirebaseAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C5352EF43FC7001BC9C6 /* FirebaseAuthManager.swift */; };
+		8399C5452EF43FC7001BC9C6 /* UserProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C5362EF43FC7001BC9C6 /* UserProfileManager.swift */; };
+		8399C5462EF43FC7001BC9C6 /* ChatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C5382EF43FC7001BC9C6 /* ChatManager.swift */; };
+		8399C5472EF43FC7001BC9C6 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C53C2EF43FC7001BC9C6 /* UserManager.swift */; };
+		8399C5482EF43FC7001BC9C6 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C5402EF43FC7001BC9C6 /* LocationManager.swift */; };
+		8399C5492EF43FC7001BC9C6 /* PostManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C53B2EF43FC7001BC9C6 /* PostManager.swift */; };
+		8399C54A2EF43FC7001BC9C6 /* GroupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C53E2EF43FC7001BC9C6 /* GroupManager.swift */; };
+		83BE67312EECF03800364DBE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83BE672F2EECEF9000364DBE /* GoogleService-Info.plist */; };
+		8E400CB91F21AC68F9AA4CF4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA44DBF82DBF80AD31CB8C99 /* SettingsView.swift */; };
+		B798A4E0EECC471F1C6FDD3F /* AppleSignInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72917690F718C843DF651197 /* AppleSignInHelper.swift */; };
+		B9682A26F7560430478D22BA /* MyGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD57CA0625B88EED47686BA /* MyGroupView.swift */; };
+		CC4E1F4C85F8312A40328CCE /* NotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3A72937D4D5C8877B74823 /* NotificationModel.swift */; };
+		DB48CF972515FB4B631C5E82 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9D4A6B3EAF0B9A2A3768B /* NotificationManager.swift */; };
+		ED082A0EC1480F396481FDF0 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E874BC79FF8AAA5DA3422C4 /* NotificationsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		83B3D85A2E38544800808CFC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83B3D8442E38544600808CFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 83B3D84B2E38544600808CFC;
+			remoteInfo = Erasmus_App;
+		};
+		83B3D8642E38544800808CFC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83B3D8442E38544600808CFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 83B3D84B2E38544600808CFC;
+			remoteInfo = Erasmus_App;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		83B4E2342E42ECD60089CAC6 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		14C9892409450B5DF0AAEE1B /* Pods-Erasmus_App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Erasmus_App.release.xcconfig"; path = "Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App.release.xcconfig"; sourceTree = "<group>"; };
+		1FE9D4A6B3EAF0B9A2A3768B /* NotificationManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationManager.swift; path = Sources/ErasmusApp/Services/Notifications/NotificationManager.swift; sourceTree = "<group>"; };
+		2E874BC79FF8AAA5DA3422C4 /* NotificationsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationsView.swift; path = Sources/ErasmusApp/Features/Notifications/NotificationsView.swift; sourceTree = "<group>"; };
+		4A545073930DB66CE5837D48 /* LocationSearchViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocationSearchViewModel.swift; path = Sources/ErasmusApp/Features/Location/LocationSearchViewModel.swift; sourceTree = "<group>"; };
+		5BFA789B0BF18A7DA9E784F8 /* GroupChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GroupChatView.swift; path = Sources/ErasmusApp/Features/Groups/GroupChatView.swift; sourceTree = "<group>"; };
+		72917690F718C843DF651197 /* AppleSignInHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppleSignInHelper.swift; path = Sources/ErasmusApp/Services/Auth/AppleSignInHelper.swift; sourceTree = "<group>"; };
+		82F64893F4E89ABDB0E65B0C /* GoogleSignInHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GoogleSignInHelper.swift; path = Sources/ErasmusApp/Services/Auth/GoogleSignInHelper.swift; sourceTree = "<group>"; };
+		831C34372EEB9BD700E33724 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		831C34382EEB9BD700E33724 /* Erasmus_App.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Erasmus_App.json; sourceTree = "<group>"; };
+		831C34392EEB9BD700E33724 /* Erasmus_AppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Erasmus_AppApp.swift; sourceTree = "<group>"; };
+		831C343A2EEB9BD700E33724 /* FirebaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseConfig.swift; sourceTree = "<group>"; };
+		831C343E2EEB9BD700E33724 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		831C343F2EEB9BD700E33724 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		831C34422EEB9BD700E33724 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
+		831C34432EEB9BD700E33724 /* ModernLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernLoginView.swift; sourceTree = "<group>"; };
+		831C34452EEB9BD700E33724 /* ModernOnboardingComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernOnboardingComponents.swift; sourceTree = "<group>"; };
+		831C34462EEB9BD700E33724 /* ModernOnboardingFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernOnboardingFlow.swift; sourceTree = "<group>"; };
+		831C34472EEB9BD700E33724 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		831C34492EEB9BD700E33724 /* ModernSignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernSignUpView.swift; sourceTree = "<group>"; };
+		831C344F2EEB9BD700E33724 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		831C34512EEB9BD700E33724 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		831C34542EEB9BD700E33724 /* EntradaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntradaView.swift; sourceTree = "<group>"; };
+		831C34552EEB9BD700E33724 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		831C34572EEB9BD700E33724 /* CreatePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePostView.swift; sourceTree = "<group>"; };
+		831C34582EEB9BD700E33724 /* ModernCreatePostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernCreatePostView.swift; sourceTree = "<group>"; };
+		831C345A2EEB9BD700E33724 /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
+		831C345D2EEB9BD700E33724 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		831C345E2EEB9BD700E33724 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		831C34682EEB9BD700E33724 /* Assets 2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets 2.xcassets"; sourceTree = "<group>"; };
+		831C346A2EEB9BD700E33724 /* EventCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCardView.swift; sourceTree = "<group>"; };
+		831C346B2EEB9BD700E33724 /* PersonCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCardView.swift; sourceTree = "<group>"; };
+		831C346C2EEB9BD700E33724 /* PostCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCardView.swift; sourceTree = "<group>"; };
+		831C346E2EEB9BD700E33724 /* LocationMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMapView.swift; sourceTree = "<group>"; };
+		836431862E3867D2009CD974 /* Erasmus-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Erasmus-App-Info.plist"; sourceTree = "<group>"; };
+		836D5C402EEE3D8A00C027E4 /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
+		8399C52B2EF43E10001BC9C6 /* Group.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Group.swift; sourceTree = "<group>"; };
+		8399C52D2EF43E6E001BC9C6 /* ModernBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModernBadgeView.swift; sourceTree = "<group>"; };
+		8399C5302EF43F71001BC9C6 /* GroupDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupDetailView.swift; sourceTree = "<group>"; };
+		8399C5312EF43F71001BC9C6 /* GroupJoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupJoinView.swift; sourceTree = "<group>"; };
+		8399C5352EF43FC7001BC9C6 /* FirebaseAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthManager.swift; sourceTree = "<group>"; };
+		8399C5362EF43FC7001BC9C6 /* UserProfileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileManager.swift; sourceTree = "<group>"; };
+		8399C5382EF43FC7001BC9C6 /* ChatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatManager.swift; sourceTree = "<group>"; };
+		8399C53A2EF43FC7001BC9C6 /* EventManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventManager.swift; sourceTree = "<group>"; };
+		8399C53B2EF43FC7001BC9C6 /* PostManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostManager.swift; sourceTree = "<group>"; };
+		8399C53C2EF43FC7001BC9C6 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
+		8399C53E2EF43FC7001BC9C6 /* GroupManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupManager.swift; sourceTree = "<group>"; };
+		8399C5402EF43FC7001BC9C6 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		83B3D84C2E38544600808CFC /* Erasmus_App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Erasmus_App.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		83B3D8592E38544800808CFC /* Erasmus_AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Erasmus_AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		83B3D8632E38544800808CFC /* Erasmus_AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Erasmus_AppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		83BE672F2EECEF9000364DBE /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9AD57CA0625B88EED47686BA /* MyGroupView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MyGroupView.swift; path = ../Sources/ErasmusApp/Features/Groups/MyGroupView.swift; sourceTree = "<group>"; };
+		9DE0DC2E9322612B44F532D7 /* Pods_Erasmus_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Erasmus_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD3A72937D4D5C8877B74823 /* NotificationModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationModel.swift; path = Sources/ErasmusApp/Core/Models/NotificationModel.swift; sourceTree = "<group>"; };
+		D8CC82BD15FB8C962A9FDDC4 /* Pods-Erasmus_App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Erasmus_App.debug.xcconfig"; path = "Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App.debug.xcconfig"; sourceTree = "<group>"; };
+		EA44DBF82DBF80AD31CB8C99 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = ../Sources/ErasmusApp/Features/Profile/SettingsView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		83B3D85C2E38544800808CFC /* Erasmus_AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = Erasmus_AppTests;
+			sourceTree = "<group>";
+		};
+		83B3D8662E38544800808CFC /* Erasmus_AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = Erasmus_AppUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		83B3D8562E38544800808CFC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		83B3D8602E38544800808CFC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FBBABB3D92FC87A0A3B57A13 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1990289D9168090DDE44183F /* Pods_Erasmus_App.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		01ABA27922C4DB763EE72E3E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D8CC82BD15FB8C962A9FDDC4 /* Pods-Erasmus_App.debug.xcconfig */,
+				14C9892409450B5DF0AAEE1B /* Pods-Erasmus_App.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		07DFE2D84017CCEAFAFB339D /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				54AC4CCFBAF63D63C65215C0 /* ErasmusApp */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+		54AC4CCFBAF63D63C65215C0 /* ErasmusApp */ = {
+			isa = PBXGroup;
+			children = (
+				D790229E40DD897F83C02178 /* Features */,
+			);
+			name = ErasmusApp;
+			sourceTree = "<group>";
+		};
+		6F4964706C0B0D58D66232E1 /* Location */ = {
+			isa = PBXGroup;
+			children = (
+				4A545073930DB66CE5837D48 /* LocationSearchViewModel.swift */,
+			);
+			name = Location;
+			sourceTree = "<group>";
+		};
+		831C343C2EEB9BD700E33724 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				831C34372EEB9BD700E33724 /* ContentView.swift */,
+				831C34382EEB9BD700E33724 /* Erasmus_App.json */,
+				831C34392EEB9BD700E33724 /* Erasmus_AppApp.swift */,
+				831C343A2EEB9BD700E33724 /* FirebaseConfig.swift */,
+			);
+			name = App;
+			path = Sources/ErasmusApp/App;
+			sourceTree = "<group>";
+		};
+		831C343D2EEB9BD700E33724 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		831C34402EEB9BD700E33724 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8399C52B2EF43E10001BC9C6 /* Group.swift */,
+				831C343E2EEB9BD700E33724 /* Models.swift */,
+				831C343F2EEB9BD700E33724 /* UserProfile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		831C34412EEB9BD700E33724 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				831C343D2EEB9BD700E33724 /* Extensions */,
+				831C34402EEB9BD700E33724 /* Models */,
+			);
+			name = Core;
+			path = Sources/ErasmusApp/Core;
+			sourceTree = "<group>";
+		};
+		831C34442EEB9BD700E33724 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				831C34422EEB9BD700E33724 /* ForgotPasswordView.swift */,
+				831C34432EEB9BD700E33724 /* ModernLoginView.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		831C34482EEB9BD700E33724 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				831C34452EEB9BD700E33724 /* ModernOnboardingComponents.swift */,
+				831C34462EEB9BD700E33724 /* ModernOnboardingFlow.swift */,
+				831C34472EEB9BD700E33724 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		831C344E2EEB9BD700E33724 /* SignUp */ = {
+			isa = PBXGroup;
+			children = (
+				831C34492EEB9BD700E33724 /* ModernSignUpView.swift */,
+			);
+			path = SignUp;
+			sourceTree = "<group>";
+		};
+		831C34502EEB9BD700E33724 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				831C34442EEB9BD700E33724 /* Login */,
+				831C34482EEB9BD700E33724 /* Onboarding */,
+				831C344E2EEB9BD700E33724 /* SignUp */,
+				831C344F2EEB9BD700E33724 /* AuthView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		831C34522EEB9BD700E33724 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				831C34512EEB9BD700E33724 /* ChatView.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		831C34532EEB9BD700E33724 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		831C34562EEB9BD700E33724 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				831C34532EEB9BD700E33724 /* Components */,
+				831C34542EEB9BD700E33724 /* EntradaView.swift */,
+				831C34552EEB9BD700E33724 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		831C34592EEB9BD700E33724 /* Post */ = {
+			isa = PBXGroup;
+			children = (
+				831C34572EEB9BD700E33724 /* CreatePostView.swift */,
+				831C34582EEB9BD700E33724 /* ModernCreatePostView.swift */,
+			);
+			path = Post;
+			sourceTree = "<group>";
+		};
+		831C345B2EEB9BD700E33724 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				831C345A2EEB9BD700E33724 /* UserProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		831C345C2EEB9BD700E33724 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				831C34502EEB9BD700E33724 /* Auth */,
+				831C34522EEB9BD700E33724 /* Chat */,
+				831C34562EEB9BD700E33724 /* Home */,
+				831C34592EEB9BD700E33724 /* Post */,
+				831C345B2EEB9BD700E33724 /* Profile */,
+			);
+			name = Features;
+			path = Sources/ErasmusApp/Features;
+			sourceTree = "<group>";
+		};
+		831C34602EEB9BD700E33724 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				831C345F2EEB9BD700E33724 /* Localizable.strings */,
+			);
+			name = Resources;
+			path = Sources/ErasmusApp/Resources;
+			sourceTree = "<group>";
+		};
+		831C34692EEB9BD700E33724 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				831C34682EEB9BD700E33724 /* Assets 2.xcassets */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
+		831C346D2EEB9BD700E33724 /* Cards */ = {
+			isa = PBXGroup;
+			children = (
+				831C346A2EEB9BD700E33724 /* EventCardView.swift */,
+				831C346B2EEB9BD700E33724 /* PersonCardView.swift */,
+				831C346C2EEB9BD700E33724 /* PostCardView.swift */,
+			);
+			path = Cards;
+			sourceTree = "<group>";
+		};
+		831C346F2EEB9BD700E33724 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				831C346E2EEB9BD700E33724 /* LocationMapView.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		831C34702EEB9BD700E33724 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				8399C52E2EF43E6E001BC9C6 /* Components */,
+				831C34692EEB9BD700E33724 /* Assets */,
+				831C346D2EEB9BD700E33724 /* Cards */,
+				831C346F2EEB9BD700E33724 /* Shared */,
+			);
+			name = UI;
+			path = Sources/ErasmusApp/UI;
+			sourceTree = "<group>";
+		};
+		8399C52E2EF43E6E001BC9C6 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				8399C52D2EF43E6E001BC9C6 /* ModernBadgeView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		8399C5322EF43F71001BC9C6 /* Groups */ = {
+			isa = PBXGroup;
+			children = (
+				8399C5302EF43F71001BC9C6 /* GroupDetailView.swift */,
+				8399C5312EF43F71001BC9C6 /* GroupJoinView.swift */,
+			);
+			path = Groups;
+			sourceTree = "<group>";
+		};
+		8399C5372EF43FC7001BC9C6 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				8399C5352EF43FC7001BC9C6 /* FirebaseAuthManager.swift */,
+				8399C5362EF43FC7001BC9C6 /* UserProfileManager.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		8399C5392EF43FC7001BC9C6 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				8399C5382EF43FC7001BC9C6 /* ChatManager.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		8399C53D2EF43FC7001BC9C6 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				8399C53A2EF43FC7001BC9C6 /* EventManager.swift */,
+				8399C53B2EF43FC7001BC9C6 /* PostManager.swift */,
+				8399C53C2EF43FC7001BC9C6 /* UserManager.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		8399C53F2EF43FC7001BC9C6 /* Group */ = {
+			isa = PBXGroup;
+			children = (
+				8399C53E2EF43FC7001BC9C6 /* GroupManager.swift */,
+			);
+			path = Group;
+			sourceTree = "<group>";
+		};
+		8399C5412EF43FC7001BC9C6 /* Location */ = {
+			isa = PBXGroup;
+			children = (
+				8399C5402EF43FC7001BC9C6 /* LocationManager.swift */,
+			);
+			path = Location;
+			sourceTree = "<group>";
+		};
+		8399C5422EF43FC7001BC9C6 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8399C5372EF43FC7001BC9C6 /* Auth */,
+				8399C5392EF43FC7001BC9C6 /* Chat */,
+				8399C53D2EF43FC7001BC9C6 /* Data */,
+				8399C53F2EF43FC7001BC9C6 /* Group */,
+				8399C5412EF43FC7001BC9C6 /* Location */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		83B3D8432E38544600808CFC = {
+			isa = PBXGroup;
+			children = (
+				8399C5422EF43FC7001BC9C6 /* Services */,
+				8399C5322EF43F71001BC9C6 /* Groups */,
+				836D5C402EEE3D8A00C027E4 /* ChatModels.swift */,
+				83BE672F2EECEF9000364DBE /* GoogleService-Info.plist */,
+				831C343C2EEB9BD700E33724 /* App */,
+				831C34412EEB9BD700E33724 /* Core */,
+				831C345C2EEB9BD700E33724 /* Features */,
+				831C34602EEB9BD700E33724 /* Resources */,
+				831C34702EEB9BD700E33724 /* UI */,
+				836431862E3867D2009CD974 /* Erasmus-App-Info.plist */,
+				83B3D85C2E38544800808CFC /* Erasmus_AppTests */,
+				83B3D8662E38544800808CFC /* Erasmus_AppUITests */,
+				83B3D84D2E38544600808CFC /* Products */,
+				01ABA27922C4DB763EE72E3E /* Pods */,
+				B664EFDE8E3DE78C612A2F01 /* Frameworks */,
+				CD3A72937D4D5C8877B74823 /* NotificationModel.swift */,
+				2E874BC79FF8AAA5DA3422C4 /* NotificationsView.swift */,
+				82F64893F4E89ABDB0E65B0C /* GoogleSignInHelper.swift */,
+				72917690F718C843DF651197 /* AppleSignInHelper.swift */,
+				1FE9D4A6B3EAF0B9A2A3768B /* NotificationManager.swift */,
+				07DFE2D84017CCEAFAFB339D /* Sources */,
+				5BFA789B0BF18A7DA9E784F8 /* GroupChatView.swift */,
+			);
+			sourceTree = "<group>";
+		};
+		83B3D84D2E38544600808CFC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				83B3D84C2E38544600808CFC /* Erasmus_App.app */,
+				83B3D8592E38544800808CFC /* Erasmus_AppTests.xctest */,
+				83B3D8632E38544800808CFC /* Erasmus_AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B664EFDE8E3DE78C612A2F01 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9DE0DC2E9322612B44F532D7 /* Pods_Erasmus_App.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BE023DBA4563DE3C9E9C9EE1 /* Groups */ = {
+			isa = PBXGroup;
+			children = (
+				9AD57CA0625B88EED47686BA /* MyGroupView.swift */,
+			);
+			name = Groups;
+			path = Groups;
+			sourceTree = "<group>";
+		};
+		C8B8022CF3C1874CA1778373 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				EA44DBF82DBF80AD31CB8C99 /* SettingsView.swift */,
+			);
+			name = Profile;
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		D790229E40DD897F83C02178 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				6F4964706C0B0D58D66232E1 /* Location */,
+				C8B8022CF3C1874CA1778373 /* Profile */,
+				BE023DBA4563DE3C9E9C9EE1 /* Groups */,
+			);
+			name = Features;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		83B3D84B2E38544600808CFC /* Erasmus_App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 83B3D86D2E38544800808CFC /* Build configuration list for PBXNativeTarget "Erasmus_App" */;
+			buildPhases = (
+				41DECCA2FC70DA60279A910F /* [CP] Check Pods Manifest.lock */,
+				83B3D8482E38544600808CFC /* Sources */,
+				83B3D84A2E38544600808CFC /* Resources */,
+				83B4E2342E42ECD60089CAC6 /* Embed Frameworks */,
+				FBBABB3D92FC87A0A3B57A13 /* Frameworks */,
+				2A7FA7AAC1A9D9F4B090B67A /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Erasmus_App;
+			productName = Erasmus_App;
+			productReference = 83B3D84C2E38544600808CFC /* Erasmus_App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		83B3D8582E38544800808CFC /* Erasmus_AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 83B3D8702E38544800808CFC /* Build configuration list for PBXNativeTarget "Erasmus_AppTests" */;
+			buildPhases = (
+				83B3D8552E38544800808CFC /* Sources */,
+				83B3D8562E38544800808CFC /* Frameworks */,
+				83B3D8572E38544800808CFC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				83B3D85B2E38544800808CFC /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				83B3D85C2E38544800808CFC /* Erasmus_AppTests */,
+			);
+			name = Erasmus_AppTests;
+			productName = Erasmus_AppTests;
+			productReference = 83B3D8592E38544800808CFC /* Erasmus_AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		83B3D8622E38544800808CFC /* Erasmus_AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 83B3D8732E38544800808CFC /* Build configuration list for PBXNativeTarget "Erasmus_AppUITests" */;
+			buildPhases = (
+				83B3D85F2E38544800808CFC /* Sources */,
+				83B3D8602E38544800808CFC /* Frameworks */,
+				83B3D8612E38544800808CFC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				83B3D8652E38544800808CFC /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				83B3D8662E38544800808CFC /* Erasmus_AppUITests */,
+			);
+			name = Erasmus_AppUITests;
+			productName = Erasmus_AppUITests;
+			productReference = 83B3D8632E38544800808CFC /* Erasmus_AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		83B3D8442E38544600808CFC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 2610;
+				TargetAttributes = {
+					83B3D84B2E38544600808CFC = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					83B3D8582E38544800808CFC = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 83B3D84B2E38544600808CFC;
+					};
+					83B3D8622E38544800808CFC = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 83B3D84B2E38544600808CFC;
+					};
+				};
+			};
+			buildConfigurationList = 83B3D8472E38544600808CFC /* Build configuration list for PBXProject "Erasmus_App" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				es,
+			);
+			mainGroup = 83B3D8432E38544600808CFC;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 83B3D84D2E38544600808CFC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				83B3D84B2E38544600808CFC /* Erasmus_App */,
+				83B3D8582E38544800808CFC /* Erasmus_AppTests */,
+				83B3D8622E38544800808CFC /* Erasmus_AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		83B3D84A2E38544600808CFC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				83BE67312EECF03800364DBE /* GoogleService-Info.plist in Resources */,
+				831C348E2EEB9BD700E33724 /* Assets 2.xcassets in Resources */,
+				831C34902EEB9BD700E33724 /* Localizable.strings in Resources */,
+				831C34912EEB9BD700E33724 /* Erasmus_App.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		83B3D8572E38544800808CFC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		83B3D8612E38544800808CFC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2A7FA7AAC1A9D9F4B090B67A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		41DECCA2FC70DA60279A910F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Erasmus_App-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		83B3D8482E38544600808CFC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				831C34712EEB9BD700E33724 /* FirebaseConfig.swift in Sources */,
+				831C34742EEB9BD700E33724 /* ModernCreatePostView.swift in Sources */,
+				8399C52F2EF43E6E001BC9C6 /* ModernBadgeView.swift in Sources */,
+				831C34772EEB9BD700E33724 /* ModernOnboardingFlow.swift in Sources */,
+				831C34782EEB9BD700E33724 /* CreatePostView.swift in Sources */,
+				831C34792EEB9BD700E33724 /* UserProfileView.swift in Sources */,
+				831C347A2EEB9BD700E33724 /* LocationMapView.swift in Sources */,
+				831C347C2EEB9BD700E33724 /* ContentView.swift in Sources */,
+				831C347E2EEB9BD700E33724 /* PostCardView.swift in Sources */,
+				8399C5432EF43FC7001BC9C6 /* EventManager.swift in Sources */,
+				8399C5442EF43FC7001BC9C6 /* FirebaseAuthManager.swift in Sources */,
+				8399C5452EF43FC7001BC9C6 /* UserProfileManager.swift in Sources */,
+				8399C5462EF43FC7001BC9C6 /* ChatManager.swift in Sources */,
+				8399C5472EF43FC7001BC9C6 /* UserManager.swift in Sources */,
+				8399C5482EF43FC7001BC9C6 /* LocationManager.swift in Sources */,
+				8399C5492EF43FC7001BC9C6 /* PostManager.swift in Sources */,
+				8399C54A2EF43FC7001BC9C6 /* GroupManager.swift in Sources */,
+				831C347F2EEB9BD700E33724 /* OnboardingView.swift in Sources */,
+				831C34802EEB9BD700E33724 /* Models.swift in Sources */,
+				831C34812EEB9BD700E33724 /* Erasmus_AppApp.swift in Sources */,
+				831C34822EEB9BD700E33724 /* ChatView.swift in Sources */,
+				8399C5332EF43F71001BC9C6 /* GroupDetailView.swift in Sources */,
+				8399C5342EF43F71001BC9C6 /* GroupJoinView.swift in Sources */,
+				831C34832EEB9BD700E33724 /* HomeView.swift in Sources */,
+				831C34842EEB9BD700E33724 /* ModernLoginView.swift in Sources */,
+				831C34852EEB9BD700E33724 /* ModernSignUpView.swift in Sources */,
+				831C34862EEB9BD700E33724 /* UserProfile.swift in Sources */,
+				831C34872EEB9BD700E33724 /* PersonCardView.swift in Sources */,
+				831C34882EEB9BD700E33724 /* EventCardView.swift in Sources */,
+				831C34892EEB9BD700E33724 /* AuthView.swift in Sources */,
+				831C348A2EEB9BD700E33724 /* ForgotPasswordView.swift in Sources */,
+				831C348C2EEB9BD700E33724 /* EntradaView.swift in Sources */,
+				836D5C412EEE3D8A00C027E4 /* ChatModels.swift in Sources */,
+				8399C52C2EF43E10001BC9C6 /* Group.swift in Sources */,
+				831C348D2EEB9BD700E33724 /* ModernOnboardingComponents.swift in Sources */,
+				CC4E1F4C85F8312A40328CCE /* NotificationModel.swift in Sources */,
+				ED082A0EC1480F396481FDF0 /* NotificationsView.swift in Sources */,
+				2C04199440E5AFA4267621C7 /* GoogleSignInHelper.swift in Sources */,
+				B798A4E0EECC471F1C6FDD3F /* AppleSignInHelper.swift in Sources */,
+				DB48CF972515FB4B631C5E82 /* NotificationManager.swift in Sources */,
+				7C520AAF59F1F6D1E8BE375E /* LocationSearchViewModel.swift in Sources */,
+				8E400CB91F21AC68F9AA4CF4 /* SettingsView.swift in Sources */,
+				B9682A26F7560430478D22BA /* MyGroupView.swift in Sources */,
+				81959742023FF26D122ACBED /* GroupChatView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		83B3D8552E38544800808CFC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		83B3D85F2E38544800808CFC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		83B3D85B2E38544800808CFC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 83B3D84B2E38544600808CFC /* Erasmus_App */;
+			targetProxy = 83B3D85A2E38544800808CFC /* PBXContainerItemProxy */;
+		};
+		83B3D8652E38544800808CFC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 83B3D84B2E38544600808CFC /* Erasmus_App */;
+			targetProxy = 83B3D8642E38544800808CFC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		831C345F2EEB9BD700E33724 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				831C345D2EEB9BD700E33724 /* en */,
+				831C345E2EEB9BD700E33724 /* es */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		83B3D86B2E38544800808CFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		83B3D86C2E38544800808CFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		83B3D86E2E38544800808CFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D8CC82BD15FB8C962A9FDDC4 /* Pods-Erasmus_App.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3BK58F49AP;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Erasmus-App-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Necesitamos acceso a la cámara para subir fotos a tus publicaciones.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Necesitamos tu ubicación para mostrarte eventos cercanos.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Necesitamos acceso a la galería para subir fotos.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "App.Erasmus-App";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		83B3D86F2E38544800808CFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 14C9892409450B5DF0AAEE1B /* Pods-Erasmus_App.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3BK58F49AP;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Erasmus-App-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Necesitamos acceso a la cámara para subir fotos a tus publicaciones.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Necesitamos tu ubicación para mostrarte eventos cercanos.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Necesitamos acceso a la galería para subir fotos.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "App.Erasmus-App";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		83B3D8712E38544800808CFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "App.Erasmus-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Erasmus_App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Erasmus_App";
+			};
+			name = Debug;
+		};
+		83B3D8722E38544800808CFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "App.Erasmus-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Erasmus_App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Erasmus_App";
+			};
+			name = Release;
+		};
+		83B3D8742E38544800808CFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "App.Erasmus-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Erasmus_App;
+			};
+			name = Debug;
+		};
+		83B3D8752E38544800808CFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "App.Erasmus-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Erasmus_App;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		83B3D8472E38544600808CFC /* Build configuration list for PBXProject "Erasmus_App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83B3D86B2E38544800808CFC /* Debug */,
+				83B3D86C2E38544800808CFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		83B3D86D2E38544800808CFC /* Build configuration list for PBXNativeTarget "Erasmus_App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83B3D86E2E38544800808CFC /* Debug */,
+				83B3D86F2E38544800808CFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		83B3D8702E38544800808CFC /* Build configuration list for PBXNativeTarget "Erasmus_AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83B3D8712E38544800808CFC /* Debug */,
+				83B3D8722E38544800808CFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		83B3D8732E38544800808CFC /* Build configuration list for PBXNativeTarget "Erasmus_AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				83B3D8742E38544800808CFC /* Debug */,
+				83B3D8752E38544800808CFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 83B3D8442E38544600808CFC /* Project object */;
+}

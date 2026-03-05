@@ -1,0 +1,7 @@
+{
+  "name": "Xcode Build Server",
+  "version": "1.0",
+  "commands": {
+    "build": "xcodebuild -scheme Erasmus_App -destination 'platform=iOS Simulator,name=iPhone 15'"
+  }
+}
