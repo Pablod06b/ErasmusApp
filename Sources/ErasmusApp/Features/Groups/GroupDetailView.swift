@@ -53,8 +53,7 @@ struct GroupDetailView: View {
                 
                 Picker("Sección", selection: $selectedTab) {
                     Text("Chat").tag(0)
-                    Text("Planes").tag(1)
-                    Text("Miembros").tag(2)
+                    Text("Organización").tag(1)
                 }
                 .pickerStyle(SegmentedPickerStyle())
                 .padding(.horizontal)
@@ -67,110 +66,12 @@ struct GroupDetailView: View {
             // Content
             TabView(selection: $selectedTab) {
                 // Chat Tab
-                // Chat Tab
                 GroupChatView(group: group)
-                .tag(0)
-                
-                // Calendar Tab
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Próximos Planes")
-                            .font(.headline)
-                            .padding(.horizontal)
-                        
-                        // Mock Events
-                        ForEach(0..<3) { i in
-                            HStack {
-                                VStack(alignment: .center) {
-                                    Text("JUL")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.red)
-                                    Text("\(20 + i)")
-                                        .font(.title3)
-                                        .fontWeight(.bold)
-                                }
-                                .padding(8)
-                                .background(Color.red.opacity(0.1))
-                                .cornerRadius(8)
-                                
-                                VStack(alignment: .leading) {
-                                    Text("Quedada en Plaza Mayor")
-                                        .fontWeight(.semibold)
-                                    Text("18:00 - Confirmados: 12")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                Spacer()
-                            }
-                            .padding()
-                            .background(Color(UIColor.secondarySystemBackground))
-                            .cornerRadius(12)
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.top)
-                }
-                .tag(1)
-                
-                // Members Tab
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Miembros del Grupo")
-                            .font(.headline)
-                            .padding(.horizontal)
-                            .padding(.top)
-                        
-                        if groupManager.isLoading {
-                            ProgressView()
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                        } else if groupManager.groupMembers.isEmpty {
-                            Text("No hay miembros visibles.")
-                                .foregroundColor(.secondary)
-                                .padding()
-                        } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(groupManager.groupMembers) { member in
-                                    HStack(spacing: 12) {
-                                        if let pUrl = URL(string: member.photoURL) {
-                                            AsyncImage(url: pUrl) { image in
-                                                image.resizable().scaledToFill()
-                                            } placeholder: {
-                                                Circle().fill(Color.gray.opacity(0.3))
-                                            }
-                                            .frame(width: 40, height: 40)
-                                            .clipShape(Circle())
-                                        } else {
-                                            Circle()
-                                                .fill(Color.blue.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .overlay(Text(String(member.displayName.prefix(1))).foregroundColor(.blue).fontWeight(.bold))
-                                        }
-                                        
-                                        VStack(alignment: .leading, spacing: 2) {
-                                            Text(member.displayName)
-                                                .font(.subheadline)
-                                                .fontWeight(.semibold)
-                                            if !member.university.isEmpty {
-                                                Text(member.university)
-                                                    .font(.caption)
-                                                    .foregroundColor(.secondary)
-                                            }
-                                        }
-                                        Spacer()
-                                    }
-                                    .padding(.horizontal)
-                                    .padding(.vertical, 8)
-                                    .background(Color(UIColor.secondarySystemBackground))
-                                    .cornerRadius(12)
-                                    .padding(.horizontal)
-                                }
-                            }
-                        }
-                    }
-                }
-                .tag(2)
+                    .tag(0)
+
+                // Organization Tab (Tasks + Calendar + Members + Invite)
+                GroupFeaturesView()
+                    .tag(1)
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         }

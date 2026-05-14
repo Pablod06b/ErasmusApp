@@ -23,14 +23,17 @@ struct UserProfileView: View {
     @State private var showGroupSheet = false
     @State private var showReportAlert = false
     @StateObject private var postManager = PostManager.shared
-    
+    @StateObject private var socialManager = SocialManager.shared
+    @StateObject private var favoritesManager = FavoritesManager.shared
+
     // UI States
     @State private var selectedTab: ProfileTab = .publicaciones
-    
-    // Social Connection States (Mocked for now)
+
+    // Social Connection States
     @State private var isFollowing = false
     @State private var isFriendRequestSent = false
-    @State private var isFriend = false // Toggles between Add Friend and ✔ Amigos
+    @State private var isFriend = false
+    @State private var socialActionLoading = false
     
     // Geometry reading for parallax
     let headerHeight: CGFloat = 350
@@ -204,6 +207,26 @@ struct UserProfileView: View {
         } message: {
             Text("Hemos recibido tu solicitud. Nuestro equipo revisará a este usuario.")
         }
+        .onAppear {
+            loadSocialStatus()
+        }
+    }
+
+    private func loadSocialStatus() {
+        guard !isCurrentUser, let myProfile = authManager.currentUser else { return }
+        let targetId = user.id
+        let status = socialManager.socialStatus(with: targetId, myProfile: myProfile)
+        switch status {
+        case .friends:
+            isFriend = true
+            isFollowing = true
+        case .requestSent:
+            isFriendRequestSent = true
+        case .following:
+            isFollowing = true
+        case .none:
+            break
+        }
     }
     
     // MARK: - Top Navigation Bar (Liquid Header)
@@ -293,7 +316,18 @@ struct UserProfileView: View {
             } else {
                 // Seguir (Glass button)
                 Button(action: {
-                    withAnimation { isFollowing.toggle() }
+                    Task {
+                        socialActionLoading = true
+                        do {
+                            if isFollowing {
+                                try await socialManager.unfollow(userId: user.id)
+                            } else {
+                                try await socialManager.follow(userId: user.id)
+                            }
+                            withAnimation { isFollowing.toggle() }
+                        } catch { }
+                        socialActionLoading = false
+                    }
                 }) {
                     Text(isFollowing ? "Siguiendo" : "Seguir")
                         .font(.subheadline)
@@ -301,7 +335,7 @@ struct UserProfileView: View {
                         .foregroundColor(isFollowing ? .white : .primary)
                         .frame(width: 90, height: 44)
                         .background(
-                            isFollowing ? 
+                            isFollowing ?
                             AnyShapeStyle(Color.black.opacity(0.6)) :
                             AnyShapeStyle(.ultraThinMaterial)
                         )
@@ -311,13 +345,25 @@ struct UserProfileView: View {
                                 .stroke(Color.gray.opacity(0.2), lineWidth: 1)
                         )
                 }
-                
-                // Añadir Amigo (Primary Main Gradient)
+
+                // Añadir Amigo
                 Button(action: {
-                    withAnimation { isFriendRequestSent.toggle() }
+                    guard !isFriendRequestSent else { return }
+                    Task {
+                        socialActionLoading = true
+                        do {
+                            try await socialManager.sendFriendRequest(toUserId: user.id, toUserName: user.name)
+                            withAnimation { isFriendRequestSent = true }
+                        } catch { }
+                        socialActionLoading = false
+                    }
                 }) {
                     HStack {
-                        Image(systemName: isFriendRequestSent ? "person.badge.clock.fill" : "person.badge.plus")
+                        if socialActionLoading {
+                            ProgressView().tint(.white).frame(width: 18, height: 18)
+                        } else {
+                            Image(systemName: isFriendRequestSent ? "person.badge.clock.fill" : "person.badge.plus")
+                        }
                         Text(isFriendRequestSent ? "Solicitud enviada" : "Añadir amigo")
                     }
                     .font(.subheadline)
@@ -332,12 +378,10 @@ struct UserProfileView: View {
                     .cornerRadius(22)
                     .shadow(color: isFriendRequestSent ? .clear : .blue.opacity(0.3), radius: 8, x: 0, y: 4)
                 }
-                .disabled(isFriendRequestSent)
-                
-                // Mensaje Icon (only if followers can direct message them natively)
-                Button(action: {
-                    // Open DM
-                }) {
+                .disabled(isFriendRequestSent || socialActionLoading)
+
+                // Mensaje Icon
+                NavigationLink(destination: Text("Chat con \(user.name)").navigationTitle("Chat")) {
                     Image(systemName: "message.fill")
                         .font(.system(size: 18))
                         .foregroundColor(.primary)

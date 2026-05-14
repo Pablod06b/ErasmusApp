@@ -126,11 +126,9 @@ struct HomeView: View {
                                 }
                             )
                         case .search:
-                            SearchTabView(
-                                posts: postManager.posts, 
-                                people: userManager.recommendedUsers, 
-                                events: eventManager.events
-                            )
+                            ExploreView()
+                        case .map:
+                            SocialMapView()
                         case .messages:
                             NavigationStack {
                                 ChatView()
@@ -191,21 +189,23 @@ struct HomeView: View {
 
 // MARK: - Enums
 enum Tab: Int, CaseIterable {
-    case home, search, messages, profile
-    
+    case home, search, map, messages, profile
+
     var icon: String {
         switch self {
         case .home: return "house"
         case .search: return "magnifyingglass"
+        case .map: return "map"
         case .messages: return "message"
         case .profile: return "person.circle"
         }
     }
-    
+
     var title: String {
         switch self {
         case .home: return "Inicio"
-        case .search: return "Buscar"
+        case .search: return "Explorar"
+        case .map: return "Mapa"
         case .messages: return "Mensajes"
         case .profile: return "Perfil"
         }

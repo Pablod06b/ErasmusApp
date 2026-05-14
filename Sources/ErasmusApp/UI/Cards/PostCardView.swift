@@ -4,10 +4,34 @@ struct PostCardView: View {
     let post: ErasmusPost
     @State private var isLiked = false
     @State private var scale: CGFloat = 1.0
-    
     @State private var showReportAlert = false
-    
+    @State private var showDetail = false
+    @StateObject private var favoritesManager = FavoritesManager.shared
+
+    private var isSaved: Bool { favoritesManager.isPostSaved(post.id.uuidString) }
+
     var body: some View {
+        NavigationLink(destination: destinationView) {
+            cardContent
+        }
+        .buttonStyle(PlainButtonStyle())
+        .alert("Contenido reportado", isPresented: $showReportAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Gracias. Hemos recibido tu reporte y revisaremos esta publicación lo antes posible.")
+        }
+    }
+
+    @ViewBuilder
+    private var destinationView: some View {
+        if post.type == .personalPlan || post.type == .openMessage {
+            OpenPlanDetailView(post: post)
+        } else {
+            PostDetailView(post: post)
+        }
+    }
+
+    private var cardContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
             HStack {
@@ -18,29 +42,32 @@ struct PostCardView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
                     .background(
-                        LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing)
+                        LinearGradient(colors: typeGradient(post.type), startPoint: .leading, endPoint: .trailing)
                     )
                     .foregroundColor(.white)
                     .clipShape(Capsule())
-                
+
                 Spacer()
-                
-                // Like Button (New Animation)
+
+                // Bookmark (Save) Button
+                Button(action: { Task { await favoritesManager.togglePost(post) } }) {
+                    Image(systemName: isSaved ? "bookmark.fill" : "bookmark")
+                        .foregroundColor(isSaved ? .blue : .secondary)
+                        .font(.system(size: 16))
+                }
+                .buttonStyle(PlainButtonStyle())
+
+                // Like Button
                 Button(action: {
                     #if os(iOS)
-                    let impactMed = UIImpactFeedbackGenerator(style: .medium)
-                    impactMed.impactOccurred()
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     #endif
-                    
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                         isLiked.toggle()
                         scale = 1.2
                     }
-                    // Reset scale
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        withAnimation {
-                            scale = 1.0
-                        }
+                        withAnimation { scale = 1.0 }
                     }
                 }) {
                     Image(systemName: isLiked ? "heart.fill" : "heart")
@@ -207,26 +234,57 @@ struct PostCardView: View {
                 }
             }
             
-            // Action button
-            if post.allowSignups == true {
+            // Open Plan Join CTA
+            if post.type == .personalPlan || post.type == .openMessage {
+                HStack(spacing: 6) {
+                    Image(systemName: "person.badge.plus")
+                        .foregroundColor(.purple)
+                    Text("Ver plan y apuntarte")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.purple)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.purple.opacity(0.08))
+                .cornerRadius(10)
+            }
+
+            // Action button (events with signup)
+            if post.allowSignups == true && post.type == .event {
                 SignUpButton(post: post)
             }
         }
         .padding(16)
-        .background(Color(UIColor.secondarySystemBackground)) // Semantic Color for Dark Mode
+        .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 2)
         .contextMenu {
+            Button(action: { Task { await favoritesManager.togglePost(post) } }) {
+                Label(isSaved ? "Quitar de guardados" : "Guardar", systemImage: isSaved ? "bookmark.slash" : "bookmark.fill")
+            }
+            Divider()
             Button(role: .destructive) {
                 showReportAlert = true
             } label: {
                 Label("Reportar contenido", systemImage: "exclamationmark.bubble")
             }
         }
-        .alert("Contenido reportado", isPresented: $showReportAlert) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("Gracias. Hemos recibido tu reporte y revisaremos esta publicación lo antes posible.")
+    }
+
+    // MARK: - Gradient by type
+    private func typeGradient(_ type: PostType) -> [Color] {
+        switch type {
+        case .event: return [.purple, .indigo]
+        case .housing: return [.teal, .blue]
+        case .recommendation: return [.orange, .red]
+        case .announcement: return [.blue, .cyan]
+        case .personalPlan: return [.green, .teal]
+        case .openMessage: return [.pink, .purple]
         }
     }
 }

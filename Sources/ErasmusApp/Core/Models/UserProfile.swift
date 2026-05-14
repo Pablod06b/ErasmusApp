@@ -27,8 +27,27 @@ struct UserProfile: Codable, Identifiable {
     var groupCode: String?
     var groupType: String?
     var permissions: UserPermissions
-    
-    init(id: String, email: String, displayName: String, username: String, createdAt: Date, lastLogin: Date, interests: [String], destination: String, photoURL: String, bio: String = "", onboardingCompleted: Bool, university: String = "", career: String = "", erasmusStatus: String = "", languages: [LanguageLevel] = [], groupCode: String? = nil, groupType: String? = nil, permissions: UserPermissions = UserPermissions(), postsCount: Int = 0, eventsCount: Int = 0, connectionsCount: Int = 0) {
+
+    // Social graph
+    var followerIds: [String]
+    var followingIds: [String]
+    var friendIds: [String]
+    var pendingFriendRequestIds: [String]
+
+    // Saved items
+    var savedPostIds: [String]
+    var savedEventIds: [String]
+    var savedCityNames: [String]
+    var savedUserIds: [String]
+
+    // Origin country/city
+    var originCountry: String
+    var originCity: String
+
+    // Account type
+    var accountType: AccountType
+
+    init(id: String, email: String, displayName: String, username: String, createdAt: Date, lastLogin: Date, interests: [String], destination: String, photoURL: String, bio: String = "", onboardingCompleted: Bool, university: String = "", career: String = "", erasmusStatus: String = "", languages: [LanguageLevel] = [], groupCode: String? = nil, groupType: String? = nil, permissions: UserPermissions = UserPermissions(), postsCount: Int = 0, eventsCount: Int = 0, connectionsCount: Int = 0, followerIds: [String] = [], followingIds: [String] = [], friendIds: [String] = [], pendingFriendRequestIds: [String] = [], savedPostIds: [String] = [], savedEventIds: [String] = [], savedCityNames: [String] = [], savedUserIds: [String] = [], originCountry: String = "España", originCity: String = "", accountType: AccountType = .student) {
         self.id = id
         self.email = email
         self.displayName = displayName
@@ -50,6 +69,17 @@ struct UserProfile: Codable, Identifiable {
         self.postsCount = postsCount
         self.eventsCount = eventsCount
         self.connectionsCount = connectionsCount
+        self.followerIds = followerIds
+        self.followingIds = followingIds
+        self.friendIds = friendIds
+        self.pendingFriendRequestIds = pendingFriendRequestIds
+        self.savedPostIds = savedPostIds
+        self.savedEventIds = savedEventIds
+        self.savedCityNames = savedCityNames
+        self.savedUserIds = savedUserIds
+        self.originCountry = originCountry
+        self.originCity = originCity
+        self.accountType = accountType
     }
     
     // Helper to convert to ExtendedUserProfile (for UI compatibility)
@@ -74,6 +104,13 @@ struct UserProfile: Codable, Identifiable {
             photoURL: photoURL
         )
     }
+}
+
+// MARK: - Account Type
+enum AccountType: String, Codable {
+    case student = "student"
+    case business = "business"
+    case association = "association"
 }
 
 // MARK: - Supporting Models

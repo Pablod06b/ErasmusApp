@@ -43,7 +43,7 @@ class GroupManager: ObservableObject {
                         "memberIds": FieldValue.arrayUnion([currentUserId])
                     ])
                     let mutableIds = group.memberIds + [currentUserId]
-                    group = SocialGroup(id: group.id, name: group.name, description: group.description, city: group.city, inviteCode: group.inviteCode, imageUrl: group.imageUrl, memberIds: mutableIds, createdAt: group.createdAt)
+                    group = SocialGroup(id: group.id, name: group.name, description: group.description, city: group.city, inviteCode: group.inviteCode, imageUrl: group.imageUrl, memberIds: mutableIds)
                 }
                 
                 // Update local currentUser Profile as well to link them to the group
@@ -66,44 +66,9 @@ class GroupManager: ObservableObject {
         }
     }
     
-    // MARK: - Create Group
+    // MARK: - (Legacy overload kept for backward compat)
     func createGroup(name: String, code: String) async -> Bool {
-        isLoading = true
-        error = nil
-        
-        guard let currentUserId = Auth.auth().currentUser?.uid else {
-            self.error = "No authenticated user"
-            isLoading = false
-            return false
-        }
-        
-        let newGroup = SocialGroup(
-            id: UUID().uuidString,
-            name: name,
-            description: "Grupo Privado",
-            city: "General", // Se podría vincular al destino del usuario
-            inviteCode: code,
-            imageUrl: nil,
-            memberIds: [currentUserId],
-            createdAt: Date()
-        )
-        
-        do {
-            try db.collection("groups").document(newGroup.id).setData(from: newGroup)
-            
-            // Link to user profile
-            try await db.collection("users").document(currentUserId).updateData([
-                "groupIds": FieldValue.arrayUnion([newGroup.id])
-            ])
-            
-            self.currentGroup = newGroup
-            isLoading = false
-            return true
-        } catch {
-            self.error = error.localizedDescription
-            isLoading = false
-            return false
-        }
+        return await createGroup(name: name, code: code, groupType: .erasmus, city: "")
     }
     
     // MARK: - Leave Group
@@ -196,6 +161,122 @@ class GroupManager: ObservableObject {
         }
     }
     
+    // MARK: - Tasks
+
+    func addTask(title: String) {
+        guard var group = currentGroup else { return }
+        let task = GroupTask(title: title)
+        group.tasks.append(task)
+        currentGroup = group
+        saveGroupLocally(group)
+    }
+
+    func updateTask(_ task: GroupTask) {
+        guard var group = currentGroup,
+              let index = group.tasks.firstIndex(where: { $0.id == task.id }) else { return }
+        group.tasks[index] = task
+        currentGroup = group
+        saveGroupLocally(group)
+    }
+
+    func deleteTask(id: String) {
+        guard var group = currentGroup else { return }
+        group.tasks.removeAll { $0.id == id }
+        currentGroup = group
+        saveGroupLocally(group)
+    }
+
+    // MARK: - Calendar Events
+
+    func addCalendarEvent(title: String, date: Date, description: String, createdBy: String) {
+        guard var group = currentGroup else { return }
+        let event = GroupCalendarEvent(title: title, date: date, description: description, createdBy: createdBy)
+        group.calendarEvents.append(event)
+        group.calendarEvents.sort { $0.date < $1.date }
+        currentGroup = group
+        saveGroupLocally(group)
+    }
+
+    func deleteCalendarEvent(id: String) {
+        guard var group = currentGroup else { return }
+        group.calendarEvents.removeAll { $0.id == id }
+        currentGroup = group
+        saveGroupLocally(group)
+    }
+
+    // MARK: - Create Group (with type)
+    func createGroup(name: String, code: String, groupType: GroupType = .erasmus, city: String = "") async -> Bool {
+        isLoading = true
+        error = nil
+
+        guard let currentUserId = Auth.auth().currentUser?.uid else {
+            self.error = "No authenticated user"
+            isLoading = false
+            return false
+        }
+
+        let destination = city.isEmpty ? "General" : city
+        let newGroup = SocialGroup(
+            id: UUID().uuidString,
+            name: name,
+            description: "Grupo \(groupType.rawValue)",
+            city: destination,
+            inviteCode: code,
+            memberIds: [currentUserId],
+            memberRoles: [currentUserId: GroupRole.admin.rawValue],
+            groupType: groupType
+        )
+
+        do {
+            try db.collection("groups").document(newGroup.id).setData(from: newGroup)
+            try await db.collection("users").document(currentUserId).updateData([
+                "groupIds": FieldValue.arrayUnion([newGroup.id])
+            ])
+            self.currentGroup = newGroup
+            isLoading = false
+            return true
+        } catch {
+            self.error = error.localizedDescription
+            isLoading = false
+            return false
+        }
+    }
+
+    // MARK: - Private helpers
+
+    private func saveGroupLocally(_ group: SocialGroup) {
+        // Persist tasks and calendar events to Firebase
+        guard let groupId = currentGroup?.id else { return }
+        do {
+            let tasksData = try group.tasks.map { task -> [String: Any] in
+                return [
+                    "id": task.id,
+                    "title": task.title,
+                    "isDone": task.isDone,
+                    "assignedTo": task.assignedTo as Any,
+                    "createdAt": Timestamp(date: task.createdAt)
+                ]
+            }
+            let eventsData = try group.calendarEvents.map { event -> [String: Any] in
+                return [
+                    "id": event.id,
+                    "title": event.title,
+                    "date": Timestamp(date: event.date),
+                    "description": event.description,
+                    "createdBy": event.createdBy
+                ]
+            }
+            Task {
+                try? await db.collection("groups").document(groupId).updateData([
+                    "tasks": tasksData,
+                    "calendarEvents": eventsData
+                ])
+            }
+        } catch {
+            print("Error saving group data: \(error)")
+        }
+    }
+
     // MARK: - Reset State
     func reset() {
         self.currentGroup = nil
