@@ -43,12 +43,14 @@ struct HomeView: View {
     @StateObject private var eventManager = EventManager.shared
     @StateObject private var userManager = UserManager.shared
     @StateObject private var notificationManager = NotificationManager.shared
-    
+    @StateObject private var router = NavigationRouter.shared
+
     @State private var selectedFilter: String = "Todos"
     @State private var showCreatePostSheet = false
     @State private var showNotificationsSheet = false
     @State private var selectedTab: Tab = .home
     @State private var selectedDestination = "Salamanca"
+    @State private var pendingChatId: String? = nil
 
     let filters = ["Todos", "Discotecas", "Eventos", "Conocer", "Casas", "Otros", "Recomendación", "Anuncio", "Plan personal", "Mensaje abierto"]
     let destinations = ["Salamanca", "Madrid", "Barcelona", "Valencia", "Roma", "París", "Berlín", "Lisboa", "Milán", "Ámsterdam"]
@@ -128,7 +130,8 @@ struct HomeView: View {
                             SocialMapView()
                         case .messages:
                             NavigationStack {
-                                ChatView()
+                                ChatView(initialConversationId: pendingChatId)
+                                    .onAppear { pendingChatId = nil }
                             }
                         case .profile:
                             NavigationStack {
@@ -160,6 +163,21 @@ struct HomeView: View {
             }
             .onChange(of: selectedDestination) { newDestination in
                 Task { await loadData() }
+            }
+            .onChange(of: router.pendingTarget) { target in
+                guard let target = target else { return }
+                switch target {
+                case .chat(let conversationId):
+                    pendingChatId = conversationId
+                    selectedTab = .messages
+                case .notifications:
+                    showNotificationsSheet = true
+                case .post:
+                    selectedTab = .home
+                case .profile:
+                    selectedTab = .profile
+                }
+                router.pendingTarget = nil
             }
             .refreshable {
                 await loadData()

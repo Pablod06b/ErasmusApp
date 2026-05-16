@@ -41,6 +41,8 @@ struct UserProfileView: View {
 
     // User's own posts (fetched specifically for this profile)
     @State private var userOwnPosts: [ErasmusPost] = []
+    @State private var showChatSheet = false
+    @State private var chatConversationId: String? = nil
     @State private var isLoadingUserPosts = false
     
     // Geometry reading for parallax
@@ -210,6 +212,16 @@ struct UserProfileView: View {
         .sheet(isPresented: $showGroupSheet) {
             MyGroupView()
         }
+        .sheet(isPresented: $showChatSheet) {
+            if let convId = chatConversationId {
+                NavigationStack {
+                    ChatDetailView(conversation: Conversation(
+                        id: convId, participants: [], lastMessage: "", lastMessageTime: Date()
+                    ))
+                    .environmentObject(authManager)
+                }
+            }
+        }
         .alert("Usuario Reportado", isPresented: $showReportAlert) {
             Button("OK", role: .cancel) { }
         } message: {
@@ -315,8 +327,15 @@ struct UserProfileView: View {
                     .cornerRadius(22)
                 }
                 
-                // Message button expands a bit more when friends
-                Button(action: { /* open DM */ }) {
+                // Message button opens DM
+                Button(action: {
+                    Task {
+                        if let convId = await ChatManager.shared.getOrCreateConversation(with: user.id) {
+                            chatConversationId = convId
+                            showChatSheet = true
+                        }
+                    }
+                }) {
                     HStack {
                         Image(systemName: "message.fill")
                         Text("Mensaje")
@@ -397,7 +416,14 @@ struct UserProfileView: View {
                 .disabled(isFriendRequestSent || socialActionLoading)
 
                 // Mensaje Icon
-                NavigationLink(destination: Text("Chat con \(user.name)").navigationTitle("Chat")) {
+                Button(action: {
+                    Task {
+                        if let convId = await ChatManager.shared.getOrCreateConversation(with: user.id) {
+                            chatConversationId = convId
+                            showChatSheet = true
+                        }
+                    }
+                }) {
                     Image(systemName: "message.fill")
                         .font(.system(size: 18))
                         .foregroundColor(.primary)

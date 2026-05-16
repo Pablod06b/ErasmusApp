@@ -227,6 +227,25 @@ class ChatManager: ObservableObject {
                 "lastMessage": trimmed,
                 "lastMessageTime": FieldValue.serverTimestamp()
             ])
+
+            // Write notification to each recipient so Cloud Function sends FCM push
+            let convDoc = try await db.collection("conversations").document(conversationId).getDocument()
+            if let participants = convDoc.data()?["participants"] as? [String] {
+                let senderName = Auth.auth().currentUser?.displayName ?? "Alguien"
+                for recipientId in participants where recipientId != currentUserId {
+                    let notif: [String: Any] = [
+                        "type": "message.fill",
+                        "title": senderName,
+                        "body": trimmed.count > 60 ? String(trimmed.prefix(60)) + "…" : trimmed,
+                        "fromUserId": currentUserId,
+                        "relatedItemId": conversationId,
+                        "createdAt": FieldValue.serverTimestamp(),
+                        "read": false
+                    ]
+                    try await db.collection("users").document(recipientId)
+                        .collection("notifications").addDocument(data: notif)
+                }
+            }
             return true
         } catch {
             print("Error sending message: \(error.localizedDescription)")

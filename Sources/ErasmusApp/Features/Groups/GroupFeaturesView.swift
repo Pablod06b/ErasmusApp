@@ -504,6 +504,7 @@ struct AddCalendarEventSheet: View {
                 Section("Evento") {
                     TextField("Título del evento", text: $title)
                     DatePicker("Fecha y hora", selection: $date, displayedComponents: [.date, .hourAndMinute])
+                        .datePickerStyle(.compact)
                     TextField("Descripción (opcional)", text: $description)
                 }
             }

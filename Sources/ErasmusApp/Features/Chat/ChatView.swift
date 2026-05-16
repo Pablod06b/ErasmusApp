@@ -9,6 +9,13 @@ struct ChatView: View {
     @State private var navigateToConversationId: String? = nil
     @State private var searchText = ""
 
+    var initialConversationId: String? = nil
+
+    init(initialConversationId: String? = nil) {
+        self.initialConversationId = initialConversationId
+        _navigateToConversationId = State(initialValue: initialConversationId)
+    }
+
     var filteredConversations: [Conversation] {
         guard !searchText.isEmpty else { return chatManager.conversations }
         return chatManager.conversations.filter {

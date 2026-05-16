@@ -35,6 +35,39 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .badge, .sound])
     }
+
+    // Handle user tapping a notification
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+        let type = userInfo["type"] as? String ?? ""
+        let relatedItemId = userInfo["relatedItemId"] as? String ?? ""
+        let fromUserId = userInfo["fromUserId"] as? String ?? ""
+
+        Task { @MainActor in
+            let router = NavigationRouter.shared
+            switch type {
+            case "message.fill":
+                if !relatedItemId.isEmpty {
+                    router.pendingTarget = .chat(conversationId: relatedItemId)
+                }
+            case "person.badge.plus", "person.2.fill":
+                router.pendingTarget = .notifications
+            case "heart.fill", "bubble.right.fill":
+                if !relatedItemId.isEmpty {
+                    router.pendingTarget = .post(postId: relatedItemId)
+                }
+            default:
+                if !fromUserId.isEmpty {
+                    router.pendingTarget = .profile(userId: fromUserId)
+                } else {
+                    router.pendingTarget = .notifications
+                }
+            }
+        }
+        completionHandler()
+    }
 }
 
 @main

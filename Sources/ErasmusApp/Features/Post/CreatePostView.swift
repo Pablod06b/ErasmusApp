@@ -398,7 +398,8 @@ struct EventFields: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             DatePicker("Fecha y Hora", selection: $date, displayedComponents: [.date, .hourAndMinute])
-            
+                .datePickerStyle(.compact)
+
             Text("Ubicación exacta").font(.headline).foregroundColor(.secondary)
             
             VStack(alignment: .leading, spacing: 0) {
@@ -489,7 +490,8 @@ struct OpenPlanFields: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             DatePicker("Fecha aproximada", selection: $date, displayedComponents: [.date, .hourAndMinute])
-            
+                .datePickerStyle(.compact)
+
             Stepper("Personas necesarias: \(participantsNeeded)", value: $participantsNeeded, in: 1...20)
             
             Text("Detalles del plan").font(.headline).foregroundColor(.secondary)

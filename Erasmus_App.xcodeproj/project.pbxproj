@@ -26,6 +26,7 @@
 		831C347F2EEB9BD700E33724 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34472EEB9BD700E33724 /* OnboardingView.swift */; };
 		831C34802EEB9BD700E33724 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C343E2EEB9BD700E33724 /* Models.swift */; };
 		831C34812EEB9BD700E33724 /* Erasmus_AppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34392EEB9BD700E33724 /* Erasmus_AppApp.swift */; };
+		AA1234560000000000000002 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1234560000000000000001 /* NavigationRouter.swift */; };
 		831C34822EEB9BD700E33724 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34512EEB9BD700E33724 /* ChatView.swift */; };
 		831C34832EEB9BD700E33724 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34552EEB9BD700E33724 /* HomeView.swift */; };
 		831C34842EEB9BD700E33724 /* ModernLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34432EEB9BD700E33724 /* ModernLoginView.swift */; };
@@ -119,6 +120,7 @@
 		831C34372EEB9BD700E33724 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		831C34382EEB9BD700E33724 /* Erasmus_App.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Erasmus_App.json; sourceTree = "<group>"; };
 		831C34392EEB9BD700E33724 /* Erasmus_AppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Erasmus_AppApp.swift; sourceTree = "<group>"; };
+		AA1234560000000000000001 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
 		831C343A2EEB9BD700E33724 /* FirebaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseConfig.swift; sourceTree = "<group>"; };
 		831C343E2EEB9BD700E33724 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		831C343F2EEB9BD700E33724 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
@@ -307,6 +309,7 @@
 				831C34382EEB9BD700E33724 /* Erasmus_App.json */,
 				831C34392EEB9BD700E33724 /* Erasmus_AppApp.swift */,
 				831C343A2EEB9BD700E33724 /* FirebaseConfig.swift */,
+				AA1234560000000000000001 /* NavigationRouter.swift */,
 			);
 			name = App;
 			path = Sources/ErasmusApp/App;
@@ -882,6 +885,7 @@
 				831C347F2EEB9BD700E33724 /* OnboardingView.swift in Sources */,
 				831C34802EEB9BD700E33724 /* Models.swift in Sources */,
 				831C34812EEB9BD700E33724 /* Erasmus_AppApp.swift in Sources */,
+				AA1234560000000000000002 /* NavigationRouter.swift in Sources */,
 				831C34822EEB9BD700E33724 /* ChatView.swift in Sources */,
 				8399C5332EF43F71001BC9C6 /* GroupDetailView.swift in Sources */,
 				8399C5342EF43F71001BC9C6 /* GroupJoinView.swift in Sources */,
