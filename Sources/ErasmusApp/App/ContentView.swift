@@ -15,8 +15,13 @@ struct ContentView: View {
         ZStack {
             if isActive {
                 if authManager.isAuthenticated {
-                    HomeView()
-                        .environmentObject(authManager)
+                    if authManager.currentUser?.onboardingCompleted == false {
+                        ModernOnboardingFlow(onFinish: {})
+                            .environmentObject(authManager)
+                    } else {
+                        HomeView()
+                            .environmentObject(authManager)
+                    }
                 } else {
                     ModernLoginView()
                         .environmentObject(authManager)

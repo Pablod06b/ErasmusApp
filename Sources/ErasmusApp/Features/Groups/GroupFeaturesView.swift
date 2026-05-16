@@ -5,7 +5,7 @@ import CoreImage.CIFilterBuiltins
 // MARK: - Group Features Main View (Calendar + Tasks + QR)
 
 struct GroupFeaturesView: View {
-    @ObservedObject var groupManager = GroupManager.shared
+    @StateObject private var groupManager = GroupManager.shared
     @EnvironmentObject var authManager: FirebaseAuthManager
 
     @State private var selectedTab: GroupFeatureTab = .tasks
@@ -110,7 +110,9 @@ struct GroupFeaturesView: View {
                 LazyVStack(spacing: 10) {
                     ForEach(groupManager.currentGroup?.tasks ?? []) { task in
                         TaskRow(task: task) { updatedTask in
-                            groupManager.updateTask(updatedTask)
+                            Task { @MainActor in
+                                GroupManager.shared.updateTask(updatedTask)
+                            }
                         }
                     }
                 }
@@ -118,7 +120,9 @@ struct GroupFeaturesView: View {
         }
         .sheet(isPresented: $showAddTask) {
             AddTaskSheet(onAdd: { title in
-                groupManager.addTask(title: title)
+                Task { @MainActor in
+                    GroupManager.shared.addTask(title: title)
+                }
             })
         }
     }
@@ -156,8 +160,10 @@ struct GroupFeaturesView: View {
         }
         .sheet(isPresented: $showAddEvent) {
             AddCalendarEventSheet(onAdd: { title, date, desc in
-                guard let userId = authManager.currentUser?.id else { return }
-                groupManager.addCalendarEvent(title: title, date: date, description: desc, createdBy: userId)
+                let userId = self.authManager.currentUser?.id ?? ""
+                Task { @MainActor in
+                    GroupManager.shared.addCalendarEvent(title: title, date: date, description: desc, createdBy: userId)
+                }
             })
         }
     }

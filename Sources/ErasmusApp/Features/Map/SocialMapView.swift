@@ -180,12 +180,8 @@ struct SocialMapView: View {
             }
             .onAppear {
                 locationManager.requestAuthorization()
-                if let loc = locationManager.currentLocation {
-                    cameraPosition = .region(MKCoordinateRegion(
-                        center: loc.coordinate,
-                        span: MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
-                    ))
-                }
+                locationManager.requestLocation()
+                // Camera starts at Madrid by default; real location is fetched in background
             }
         }
     }

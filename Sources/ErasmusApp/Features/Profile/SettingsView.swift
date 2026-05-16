@@ -16,7 +16,7 @@ struct SettingsView: View {
     @State private var showEmailChangeAlert = false
     @State private var showMaintenanceAlert = false
 
-    // State bindings
+    // Settings state — loaded from Firebase on appear
     @State private var privateAccount = false
     @State private var showOnlineStatus = true
     @State private var notificationsEnabled = true
@@ -36,34 +36,40 @@ struct SettingsView: View {
                         showEmailChangeAlert = true
                     }
                 }
-                
+
                 // Section 2: Privacy
                 Section(header: Text("Privacidad").font(.subheadline).foregroundColor(.gray)) {
                     Toggle(isOn: $privateAccount) {
                         HStack {
-                            Image(systemName: "lock.shield.fill")
-                                .foregroundColor(.green)
+                            Image(systemName: "lock.shield.fill").foregroundColor(.green)
                             Text("Cuenta privada")
                         }
                     }
+                    .onChange(of: privateAccount) { value in
+                        Task { try? await authManager.updateUserProfile(data: ["permissions.isPrivateAccount": value]) }
+                    }
                     Toggle(isOn: $showOnlineStatus) {
                         HStack {
-                            Image(systemName: "record.circle.fill")
-                                .foregroundColor(.green)
+                            Image(systemName: "record.circle.fill").foregroundColor(.green)
                             Text("Mostrar estado en línea")
                         }
                     }
+                    .onChange(of: showOnlineStatus) { value in
+                        Task { try? await authManager.updateUserProfile(data: ["permissions.showOnlineStatus": value]) }
+                    }
                     SettingsRowView(icon: "eye.slash.fill", title: "Usuarios bloqueados", iconColor: .red) {}
                 }
-                
+
                 // Section 3: Notifications
                 Section(header: Text("Notificaciones").font(.subheadline).foregroundColor(.gray)) {
                     Toggle(isOn: $notificationsEnabled) {
                         HStack {
-                            Image(systemName: "bell.badge.fill")
-                                .foregroundColor(.orange)
-                            Text("Notificaciones push")
+                            Image(systemName: "bell.badge.fill").foregroundColor(.orange)
+                            Text("Notificaciones")
                         }
+                    }
+                    .onChange(of: notificationsEnabled) { value in
+                        Task { try? await authManager.updateUserProfile(data: ["permissions.allowNotifications": value]) }
                     }
                     if notificationsEnabled {
                         SettingsRowView(icon: "message.fill", title: "Notificaciones de mensajes", iconColor: .orange) {}
@@ -177,9 +183,18 @@ struct SettingsView: View {
         } message: {
             Text("Te enviaremos un correo electrónico a \(authManager.currentUser?.email ?? "tu email") para restablecer tu contraseña.")
         }
+        .onAppear { loadSettings() }
         .sheet(isPresented: $showEditProfile) {
             EditProfileView(user: authManager.currentUser?.toExtendedUserProfile() ?? ExtendedUserProfile.sampleUser)
+                .environmentObject(authManager)
         }
+    }
+
+    private func loadSettings() {
+        guard let permissions = authManager.currentUser?.permissions else { return }
+        privateAccount = permissions.isPrivateAccount
+        showOnlineStatus = permissions.showOnlineStatus
+        notificationsEnabled = permissions.allowNotifications
     }
     
     private func sendPasswordReset() {

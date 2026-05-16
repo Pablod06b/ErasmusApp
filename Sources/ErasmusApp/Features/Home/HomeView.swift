@@ -51,7 +51,7 @@ struct HomeView: View {
     @State private var selectedDestination = "Salamanca"
 
     let filters = ["Todos", "Discotecas", "Eventos", "Conocer", "Casas", "Otros", "Recomendación", "Anuncio", "Plan personal", "Mensaje abierto"]
-    let destinations = ["Salamanca", "Madrid", "Barcelona", "Valencia"]
+    let destinations = ["Salamanca", "Madrid", "Barcelona", "Valencia", "Roma", "París", "Berlín", "Lisboa", "Milán", "Ámsterdam"]
     
     var postsFiltrados: [ErasmusPost] {
         // Redundant filter if PostManager handles it, but keeps UI consistent during transitions
@@ -81,11 +81,8 @@ struct HomeView: View {
         return destinationFiltered
     }
     
-    var personasFiltradas: [Persona] {
-        if selectedFilter == "Todos" {
-            return userManager.recommendedUsers
-        }
-        return userManager.recommendedUsers
+    var personasFiltradas: [UserProfile] {
+        return userManager.recommendedProfiles
     }
 
     var eventosFiltrados: [Evento] {
@@ -180,10 +177,16 @@ struct HomeView: View {
     }
     
     private func loadData() async {
+        // Use user's Erasmus destination if available
+        if selectedDestination == "Salamanca",
+           let userDest = authManager.currentUser?.destination, !userDest.isEmpty {
+            selectedDestination = userDest
+        }
         await postManager.fetchInitialPosts(destination: selectedDestination)
         await eventManager.fetchEvents(destination: selectedDestination)
         await userManager.fetchRecommendedUsers(destination: selectedDestination)
         await GroupManager.shared.fetchUserGroup()
+        notificationManager.startListening()
     }
 }
 
@@ -413,11 +416,12 @@ struct HomeTabView: View {
     @Binding var selectedFilter: String
     let posts: [ErasmusPost]
     let eventos: [Evento]
-    let personas: [Persona]
+    let personas: [UserProfile]
     let selectedDestination: String
     let filters: [String]
     @Binding var showCreatePostSheet: Bool
-    
+    @EnvironmentObject var authManager: FirebaseAuthManager
+
     // Pagination props
     var isLoading: Bool = false
     var onLoadMore: () async -> Void = {}
@@ -461,8 +465,9 @@ struct HomeTabView: View {
                     SectionHeader(title: "Gente en \(selectedDestination)", icon: "person.2.fill", color: .blue)
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(personas) { persona in
-                                PersonCardView(persona: persona).frame(width: 160)
+                            ForEach(personas) { profile in
+                                PersonCardView(profile: profile).frame(width: 160)
+                                    .environmentObject(authManager)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -518,8 +523,9 @@ struct HomeTabView: View {
                      EmptyStateView(icon: "person.2.slash", title: "Nadie nuevo por aquí", message: "No hemos encontrado personas nuevas para conocer en \(selectedDestination).")
                  } else {
                      LazyVStack(spacing: 16) {
-                        ForEach(personas) { persona in
-                            PersonCardView(persona: persona)
+                        ForEach(personas) { profile in
+                            PersonCardView(profile: profile)
+                                .environmentObject(authManager)
                         }
                     }
                  }
@@ -563,34 +569,36 @@ struct SectionHeader: View {
 
 struct SearchTabView: View {
     let posts: [ErasmusPost]
-    let people: [Persona]
+    let people: [UserProfile]
     let events: [Evento]
-    
+    @EnvironmentObject var authManager: FirebaseAuthManager
+
     @State private var searchText = ""
-    
+
     var filteredPosts: [ErasmusPost] {
         if searchText.isEmpty { return [] }
         return posts.filter { $0.title.localizedCaseInsensitiveContains(searchText) || $0.description.localizedCaseInsensitiveContains(searchText) }
     }
-    
-    var filteredPeople: [Persona] {
+
+    var filteredPeople: [UserProfile] {
         if searchText.isEmpty { return [] }
-        return people.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        return people.filter { $0.displayName.localizedCaseInsensitiveContains(searchText) || $0.username.localizedCaseInsensitiveContains(searchText) }
     }
-    
+
     var filteredEvents: [Evento] {
         if searchText.isEmpty { return [] }
         return events.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
     }
-    
+
     var body: some View {
         NavigationStack {
             List {
                 if !searchText.isEmpty {
                     if !filteredPeople.isEmpty {
                         Section("Personas") {
-                            ForEach(filteredPeople) { person in
-                                PersonCardView(persona: person)
+                            ForEach(filteredPeople) { profile in
+                                PersonCardView(profile: profile)
+                                    .environmentObject(authManager)
                             }
                         }
                     }

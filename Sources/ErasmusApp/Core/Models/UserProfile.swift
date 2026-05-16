@@ -134,6 +134,10 @@ struct UserPermissions: Codable {
     var location: Bool = false
     var notifications: Bool = false
     var camera: Bool = false
+    // Privacy settings
+    var isPrivateAccount: Bool = false
+    var showOnlineStatus: Bool = true
+    var allowNotifications: Bool = true
 }
 
 // MARK: - Extended User Profile Model

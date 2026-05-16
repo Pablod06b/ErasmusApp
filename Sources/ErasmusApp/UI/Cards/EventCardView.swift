@@ -9,21 +9,25 @@ struct EventCardView: View {
         VStack(alignment: .leading, spacing: 0) {
             // Image with Overlay
             ZStack(alignment: .topTrailing) {
-                if !evento.imageName.isEmpty {
-                    Image(evento.imageName) // Use real image in future
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 140)
-                        .clipped()
+                if let imageURL = evento.imageURL, !imageURL.isEmpty, let url = URL(string: imageURL) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image.resizable().scaledToFill().frame(height: 140).clipped()
+                        default:
+                            eventImagePlaceholder
+                        }
+                    }
+                } else if !evento.imageName.isEmpty, UIImage(systemName: evento.imageName) != nil {
+                    ZStack {
+                        LinearGradient(colors: [.orange.opacity(0.7), .red.opacity(0.7)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            .frame(height: 140)
+                        Image(systemName: evento.imageName)
+                            .font(.system(size: 44))
+                            .foregroundColor(.white.opacity(0.6))
+                    }
                 } else {
-                    Rectangle()
-                        .fill(LinearGradient(colors: [.orange, .red], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(height: 140)
-                        .overlay(
-                            Image(systemName: "party.popper.fill")
-                                .font(.system(size: 40))
-                                .foregroundColor(.white.opacity(0.3))
-                        )
+                    eventImagePlaceholder
                 }
                 
                 // Date Badge
@@ -75,11 +79,38 @@ struct EventCardView: View {
             // Content
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text(evento.title)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                        .lineLimit(1)
+                    // Business verified badge
+                    if evento.isVerifiedBusiness == true {
+                        HStack(spacing: 4) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundColor(.blue)
+                                .font(.caption2)
+                            Text("Oficial")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.blue)
+                        }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(6)
+                    }
+                    // Promoted badge
+                    if evento.isPromoted == true {
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.orange)
+                                .font(.caption2)
+                            Text("Destacado")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.orange)
+                        }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Color.orange.opacity(0.1))
+                        .cornerRadius(6)
+                    }
                     Spacer()
                     if let price = evento.price {
                         Text(price > 0 ? "\(String(format: "%.0f", price))€" : "Gratis")
@@ -91,6 +122,14 @@ struct EventCardView: View {
                             .background(Color.green.opacity(0.1))
                             .cornerRadius(8)
                     }
+                }
+                HStack {
+                    Text(evento.title)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                    Spacer()
                 }
                 
                 HStack {
@@ -118,6 +157,17 @@ struct EventCardView: View {
         .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+    }
+
+    private var eventImagePlaceholder: some View {
+        Rectangle()
+            .fill(LinearGradient(colors: [.orange, .red], startPoint: .topLeading, endPoint: .bottomTrailing))
+            .frame(height: 140)
+            .overlay(
+                Image(systemName: "party.popper.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(.white.opacity(0.3))
+            )
     }
 }
 

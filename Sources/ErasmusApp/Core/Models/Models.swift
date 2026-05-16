@@ -42,9 +42,11 @@ struct ErasmusPost: Identifiable, Codable, Equatable {
     var isReported: Bool? = false
     let rating: Int?
     let participantsNeeded: Int?
-    
+    var isVerifiedBusiness: Bool?
+    var isPromoted: Bool?
+
     // Custom init to provide defaults for existing code
-    init(id: UUID = UUID(), userId: String, type: PostType, title: String, description: String, location: String?, destination: String, date: Date?, isPaid: Bool?, price: Double?, allowSignups: Bool?, visibility: Visibility, imageName: String?, category: String?, contact: String?, isReported: Bool? = false, rating: Int? = nil, participantsNeeded: Int? = nil) {
+    init(id: UUID = UUID(), userId: String, type: PostType, title: String, description: String, location: String?, destination: String, date: Date?, isPaid: Bool?, price: Double?, allowSignups: Bool?, visibility: Visibility, imageName: String?, category: String?, contact: String?, isReported: Bool? = false, rating: Int? = nil, participantsNeeded: Int? = nil, isVerifiedBusiness: Bool? = false, isPromoted: Bool? = false) {
         self.id = id
         self.userId = userId
         self.type = type
@@ -63,6 +65,8 @@ struct ErasmusPost: Identifiable, Codable, Equatable {
         self.isReported = isReported
         self.rating = rating
         self.participantsNeeded = participantsNeeded
+        self.isVerifiedBusiness = isVerifiedBusiness
+        self.isPromoted = isPromoted
     }
     
     static func ==(lhs: ErasmusPost, rhs: ErasmusPost) -> Bool {
@@ -99,14 +103,37 @@ extension FileManager {
 #endif
 
 struct Evento: Identifiable, Codable {
-    let id = UUID()
+    var id: UUID = UUID()
     let title: String
     let location: String
     let date: String
     let imageName: String
     let participants: Int?
     let category: String
-    var price: Double? = nil
+    var price: Double?
+    // Firebase / business fields
+    var firestoreId: String?
+    var userId: String?
+    var city: String?
+    var isVerifiedBusiness: Bool?
+    var isPromoted: Bool?
+    var eventDescription: String?
+    var imageURL: String?
+
+    init(
+        id: UUID = UUID(), title: String, location: String, date: String,
+        imageName: String = "calendar", participants: Int? = nil, category: String,
+        price: Double? = nil, firestoreId: String? = nil, userId: String? = nil,
+        city: String? = nil, isVerifiedBusiness: Bool? = false, isPromoted: Bool? = false,
+        eventDescription: String? = nil, imageURL: String? = nil
+    ) {
+        self.id = id; self.title = title; self.location = location; self.date = date
+        self.imageName = imageName; self.participants = participants; self.category = category
+        self.price = price; self.firestoreId = firestoreId; self.userId = userId
+        self.city = city; self.isVerifiedBusiness = isVerifiedBusiness
+        self.isPromoted = isPromoted; self.eventDescription = eventDescription
+        self.imageURL = imageURL
+    }
 }
 
 struct Persona: Identifiable, Codable {
@@ -114,6 +141,7 @@ struct Persona: Identifiable, Codable {
     let name: String
     let imageName: String
     let commonInterests: Int
+    var userId: String?
 }
 
 

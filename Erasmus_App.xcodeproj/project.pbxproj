@@ -8,7 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		1990289D9168090DDE44183F /* Pods_Erasmus_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DE0DC2E9322612B44F532D7 /* Pods_Erasmus_App.framework */; };
+		213B9CBDA9BDA025BCE2CE73 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E4E72CA7ADCAFD690F9F4F6 /* ExploreView.swift */; };
+		250219618665CE2A47039F5D /* GroupFeaturesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3309C48B75AFC285E3B349F /* GroupFeaturesView.swift */; };
 		2C04199440E5AFA4267621C7 /* GoogleSignInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F64893F4E89ABDB0E65B0C /* GoogleSignInHelper.swift */; };
+		30DA6A080C264A6C45BBCAC0 /* OpenPlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA63352294E728D50C6AC31 /* OpenPlanDetailView.swift */; };
+		40EF67946FFBA68D1EA10555 /* DestinationExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD4BBDA6F3A204DB3CCB004 /* DestinationExplorerView.swift */; };
 		7C520AAF59F1F6D1E8BE375E /* LocationSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A545073930DB66CE5837D48 /* LocationSearchViewModel.swift */; };
 		81959742023FF26D122ACBED /* GroupChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA789B0BF18A7DA9E784F8 /* GroupChatView.swift */; };
 		831C34712EEB9BD700E33724 /* FirebaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C343A2EEB9BD700E33724 /* FirebaseConfig.swift */; };
@@ -50,9 +54,17 @@
 		8399C5492EF43FC7001BC9C6 /* PostManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C53B2EF43FC7001BC9C6 /* PostManager.swift */; };
 		8399C54A2EF43FC7001BC9C6 /* GroupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C53E2EF43FC7001BC9C6 /* GroupManager.swift */; };
 		83BE67312EECF03800364DBE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83BE672F2EECEF9000364DBE /* GoogleService-Info.plist */; };
+		83E4BF152FA02B1000C04300 /* LiquidGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E4BF142FA02B1000C04300 /* LiquidGlass.swift */; };
+		84D453862864F72CE39030DE /* GroupCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA51465D7F5D39BF34F0883 /* GroupCreateView.swift */; };
+		8CF90CD7663DB5B81BDB5A84 /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C377D978A878D8D169040DA8 /* PostDetailView.swift */; };
 		8E400CB91F21AC68F9AA4CF4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA44DBF82DBF80AD31CB8C99 /* SettingsView.swift */; };
+		9C92615225BAD69AF1F4764D /* SocialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660605F5B2C252C4242036AB /* SocialModels.swift */; };
+		9FE8915E1CCD5152A9FAD883 /* FavoritesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEDF721358466BD3D2232C7 /* FavoritesManager.swift */; };
+		AB2E2E64CAD62DA37D5E52B4 /* SocialMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4036D301070C0E988509CF /* SocialMapView.swift */; };
+		B5D2219365489B66E392FB23 /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1B08EC0D750C64AC52C16E /* FavoritesView.swift */; };
 		B798A4E0EECC471F1C6FDD3F /* AppleSignInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72917690F718C843DF651197 /* AppleSignInHelper.swift */; };
 		B9682A26F7560430478D22BA /* MyGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD57CA0625B88EED47686BA /* MyGroupView.swift */; };
+		BDF75BD72B5C2DA91714014D /* SocialManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF19CDAA721EC592A202BEE /* SocialManager.swift */; };
 		CC4E1F4C85F8312A40328CCE /* NotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3A72937D4D5C8877B74823 /* NotificationModel.swift */; };
 		DB48CF972515FB4B631C5E82 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FE9D4A6B3EAF0B9A2A3768B /* NotificationManager.swift */; };
 		ED082A0EC1480F396481FDF0 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E874BC79FF8AAA5DA3422C4 /* NotificationsView.swift */; };
@@ -89,11 +101,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0E1B08EC0D750C64AC52C16E /* FavoritesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FavoritesView.swift; path = Sources/ErasmusApp/Features/Favorites/FavoritesView.swift; sourceTree = SOURCE_ROOT; };
+		0E4E72CA7ADCAFD690F9F4F6 /* ExploreView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExploreView.swift; path = Sources/ErasmusApp/Features/Explore/ExploreView.swift; sourceTree = SOURCE_ROOT; };
 		14C9892409450B5DF0AAEE1B /* Pods-Erasmus_App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Erasmus_App.release.xcconfig"; path = "Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App.release.xcconfig"; sourceTree = "<group>"; };
 		1FE9D4A6B3EAF0B9A2A3768B /* NotificationManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationManager.swift; path = Sources/ErasmusApp/Services/Notifications/NotificationManager.swift; sourceTree = "<group>"; };
+		2BD4BBDA6F3A204DB3CCB004 /* DestinationExplorerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DestinationExplorerView.swift; path = Sources/ErasmusApp/Features/Destinations/DestinationExplorerView.swift; sourceTree = SOURCE_ROOT; };
+		2DA51465D7F5D39BF34F0883 /* GroupCreateView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GroupCreateView.swift; path = ../Sources/ErasmusApp/Features/Groups/GroupCreateView.swift; sourceTree = "<group>"; };
 		2E874BC79FF8AAA5DA3422C4 /* NotificationsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationsView.swift; path = Sources/ErasmusApp/Features/Notifications/NotificationsView.swift; sourceTree = "<group>"; };
 		4A545073930DB66CE5837D48 /* LocationSearchViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocationSearchViewModel.swift; path = Sources/ErasmusApp/Features/Location/LocationSearchViewModel.swift; sourceTree = "<group>"; };
 		5BFA789B0BF18A7DA9E784F8 /* GroupChatView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GroupChatView.swift; path = Sources/ErasmusApp/Features/Groups/GroupChatView.swift; sourceTree = "<group>"; };
+		660605F5B2C252C4242036AB /* SocialModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocialModels.swift; path = Sources/ErasmusApp/Core/Models/SocialModels.swift; sourceTree = SOURCE_ROOT; };
+		6F4036D301070C0E988509CF /* SocialMapView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocialMapView.swift; path = Sources/ErasmusApp/Features/Map/SocialMapView.swift; sourceTree = SOURCE_ROOT; };
 		72917690F718C843DF651197 /* AppleSignInHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppleSignInHelper.swift; path = Sources/ErasmusApp/Services/Auth/AppleSignInHelper.swift; sourceTree = "<group>"; };
 		82F64893F4E89ABDB0E65B0C /* GoogleSignInHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GoogleSignInHelper.swift; path = Sources/ErasmusApp/Services/Auth/GoogleSignInHelper.swift; sourceTree = "<group>"; };
 		831C34372EEB9BD700E33724 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -140,11 +158,17 @@
 		83B3D8592E38544800808CFC /* Erasmus_AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Erasmus_AppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		83B3D8632E38544800808CFC /* Erasmus_AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Erasmus_AppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		83BE672F2EECEF9000364DBE /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		83E4BF142FA02B1000C04300 /* LiquidGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlass.swift; sourceTree = "<group>"; };
+		8FF19CDAA721EC592A202BEE /* SocialManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocialManager.swift; path = Sources/ErasmusApp/Services/Social/SocialManager.swift; sourceTree = SOURCE_ROOT; };
 		9AD57CA0625B88EED47686BA /* MyGroupView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MyGroupView.swift; path = ../Sources/ErasmusApp/Features/Groups/MyGroupView.swift; sourceTree = "<group>"; };
 		9DE0DC2E9322612B44F532D7 /* Pods_Erasmus_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Erasmus_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABA63352294E728D50C6AC31 /* OpenPlanDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OpenPlanDetailView.swift; path = Sources/ErasmusApp/Features/Plans/OpenPlanDetailView.swift; sourceTree = SOURCE_ROOT; };
+		C377D978A878D8D169040DA8 /* PostDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PostDetailView.swift; path = Sources/ErasmusApp/Features/Post/PostDetailView.swift; sourceTree = SOURCE_ROOT; };
 		CD3A72937D4D5C8877B74823 /* NotificationModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationModel.swift; path = Sources/ErasmusApp/Core/Models/NotificationModel.swift; sourceTree = "<group>"; };
+		D3309C48B75AFC285E3B349F /* GroupFeaturesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GroupFeaturesView.swift; path = Sources/ErasmusApp/Features/Groups/GroupFeaturesView.swift; sourceTree = SOURCE_ROOT; };
 		D8CC82BD15FB8C962A9FDDC4 /* Pods-Erasmus_App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Erasmus_App.debug.xcconfig"; path = "Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App.debug.xcconfig"; sourceTree = "<group>"; };
 		EA44DBF82DBF80AD31CB8C99 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = ../Sources/ErasmusApp/Features/Profile/SettingsView.swift; sourceTree = "<group>"; };
+		FBEDF721358466BD3D2232C7 /* FavoritesManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FavoritesManager.swift; path = Sources/ErasmusApp/Services/Favorites/FavoritesManager.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -207,10 +231,44 @@
 			name = Sources;
 			sourceTree = "<group>";
 		};
+		227840FB8943D52BB6D395FD /* Explore */ = {
+			isa = PBXGroup;
+			children = (
+				0E4E72CA7ADCAFD690F9F4F6 /* ExploreView.swift */,
+			);
+			name = Explore;
+			sourceTree = "<group>";
+		};
+		2CA2F19FD29A49658C75CD6F /* Favorites */ = {
+			isa = PBXGroup;
+			children = (
+				FBEDF721358466BD3D2232C7 /* FavoritesManager.swift */,
+			);
+			name = Favorites;
+			sourceTree = "<group>";
+		};
+		3217C38B6012081E7BF0402F /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				660605F5B2C252C4242036AB /* SocialModels.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		3999B73750D8FE0EB4ACF926 /* Social */ = {
+			isa = PBXGroup;
+			children = (
+				8FF19CDAA721EC592A202BEE /* SocialManager.swift */,
+			);
+			name = Social;
+			sourceTree = "<group>";
+		};
 		54AC4CCFBAF63D63C65215C0 /* ErasmusApp */ = {
 			isa = PBXGroup;
 			children = (
 				D790229E40DD897F83C02178 /* Features */,
+				C067422DDE1E54B986C5CB10 /* Core */,
+				7D0D63786E214E707838024E /* Services */,
 			);
 			name = ErasmusApp;
 			sourceTree = "<group>";
@@ -221,6 +279,23 @@
 				4A545073930DB66CE5837D48 /* LocationSearchViewModel.swift */,
 			);
 			name = Location;
+			sourceTree = "<group>";
+		};
+		7D0D63786E214E707838024E /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				2CA2F19FD29A49658C75CD6F /* Favorites */,
+				3999B73750D8FE0EB4ACF926 /* Social */,
+			);
+			name = Services;
+			sourceTree = "<group>";
+		};
+		7F681E9ABE2070E13D993DB1 /* Post */ = {
+			isa = PBXGroup;
+			children = (
+				C377D978A878D8D169040DA8 /* PostDetailView.swift */,
+			);
+			name = Post;
 			sourceTree = "<group>";
 		};
 		831C343C2EEB9BD700E33724 /* App */ = {
@@ -499,6 +574,7 @@
 				1FE9D4A6B3EAF0B9A2A3768B /* NotificationManager.swift */,
 				07DFE2D84017CCEAFAFB339D /* Sources */,
 				5BFA789B0BF18A7DA9E784F8 /* GroupChatView.swift */,
+				83E4BF142FA02B1000C04300 /* LiquidGlass.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -510,6 +586,14 @@
 				83B3D8632E38544800808CFC /* Erasmus_AppUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A790BDEF01523EE22C7B9688 /* Plans */ = {
+			isa = PBXGroup;
+			children = (
+				ABA63352294E728D50C6AC31 /* OpenPlanDetailView.swift */,
+			);
+			name = Plans;
 			sourceTree = "<group>";
 		};
 		B664EFDE8E3DE78C612A2F01 /* Frameworks */ = {
@@ -524,9 +608,18 @@
 			isa = PBXGroup;
 			children = (
 				9AD57CA0625B88EED47686BA /* MyGroupView.swift */,
+				D3309C48B75AFC285E3B349F /* GroupFeaturesView.swift */,
+				2DA51465D7F5D39BF34F0883 /* GroupCreateView.swift */,
 			);
-			name = Groups;
 			path = Groups;
+			sourceTree = "<group>";
+		};
+		C067422DDE1E54B986C5CB10 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				3217C38B6012081E7BF0402F /* Models */,
+			);
+			name = Core;
 			sourceTree = "<group>";
 		};
 		C8B8022CF3C1874CA1778373 /* Profile */ = {
@@ -534,7 +627,6 @@
 			children = (
 				EA44DBF82DBF80AD31CB8C99 /* SettingsView.swift */,
 			);
-			name = Profile;
 			path = Profile;
 			sourceTree = "<group>";
 		};
@@ -544,8 +636,38 @@
 				6F4964706C0B0D58D66232E1 /* Location */,
 				C8B8022CF3C1874CA1778373 /* Profile */,
 				BE023DBA4563DE3C9E9C9EE1 /* Groups */,
+				FBE953CF38CD716CAFE2B7AC /* Destinations */,
+				227840FB8943D52BB6D395FD /* Explore */,
+				D8D88C1DAAC98910D27903E0 /* Favorites */,
+				F92FD751E6DC29F50F056165 /* Map */,
+				A790BDEF01523EE22C7B9688 /* Plans */,
+				7F681E9ABE2070E13D993DB1 /* Post */,
 			);
 			name = Features;
+			sourceTree = "<group>";
+		};
+		D8D88C1DAAC98910D27903E0 /* Favorites */ = {
+			isa = PBXGroup;
+			children = (
+				0E1B08EC0D750C64AC52C16E /* FavoritesView.swift */,
+			);
+			name = Favorites;
+			sourceTree = "<group>";
+		};
+		F92FD751E6DC29F50F056165 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				6F4036D301070C0E988509CF /* SocialMapView.swift */,
+			);
+			name = Map;
+			sourceTree = "<group>";
+		};
+		FBE953CF38CD716CAFE2B7AC /* Destinations */ = {
+			isa = PBXGroup;
+			children = (
+				2BD4BBDA6F3A204DB3CCB004 /* DestinationExplorerView.swift */,
+			);
+			name = Destinations;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -775,12 +897,24 @@
 				CC4E1F4C85F8312A40328CCE /* NotificationModel.swift in Sources */,
 				ED082A0EC1480F396481FDF0 /* NotificationsView.swift in Sources */,
 				2C04199440E5AFA4267621C7 /* GoogleSignInHelper.swift in Sources */,
+				83E4BF152FA02B1000C04300 /* LiquidGlass.swift in Sources */,
 				B798A4E0EECC471F1C6FDD3F /* AppleSignInHelper.swift in Sources */,
 				DB48CF972515FB4B631C5E82 /* NotificationManager.swift in Sources */,
 				7C520AAF59F1F6D1E8BE375E /* LocationSearchViewModel.swift in Sources */,
 				8E400CB91F21AC68F9AA4CF4 /* SettingsView.swift in Sources */,
 				B9682A26F7560430478D22BA /* MyGroupView.swift in Sources */,
 				81959742023FF26D122ACBED /* GroupChatView.swift in Sources */,
+				9C92615225BAD69AF1F4764D /* SocialModels.swift in Sources */,
+				40EF67946FFBA68D1EA10555 /* DestinationExplorerView.swift in Sources */,
+				213B9CBDA9BDA025BCE2CE73 /* ExploreView.swift in Sources */,
+				B5D2219365489B66E392FB23 /* FavoritesView.swift in Sources */,
+				250219618665CE2A47039F5D /* GroupFeaturesView.swift in Sources */,
+				AB2E2E64CAD62DA37D5E52B4 /* SocialMapView.swift in Sources */,
+				30DA6A080C264A6C45BBCAC0 /* OpenPlanDetailView.swift in Sources */,
+				8CF90CD7663DB5B81BDB5A84 /* PostDetailView.swift in Sources */,
+				9FE8915E1CCD5152A9FAD883 /* FavoritesManager.swift in Sources */,
+				BDF75BD72B5C2DA91714014D /* SocialManager.swift in Sources */,
+				84D453862864F72CE39030DE /* GroupCreateView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

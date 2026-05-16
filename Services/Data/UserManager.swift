@@ -1,41 +1,59 @@
 import Foundation
 import FirebaseFirestore
+import FirebaseAuth
 
+@MainActor
 class UserManager: ObservableObject {
     static let shared = UserManager()
     private let db = Firestore.firestore()
-    
-    @Published var recommendedUsers: [Persona] = []
+
+    @Published var recommendedProfiles: [UserProfile] = []
     @Published var isLoading = false
-    
+
     private init() {}
-    
-    // MARK: - Fetch Recommended Users
+
+    // MARK: - Fetch Recommended Users from Firebase
     func fetchRecommendedUsers(destination: String? = nil) async {
-        DispatchQueue.main.async { self.isLoading = true }
-        
+        isLoading = true
+
         do {
-             // Simulate network fetch
-            try await Task.sleep(nanoseconds: 500_000_000)
-            
-            let fetchedUsers = [
-                Persona(name: "Pablo, 19", imageName: "person1", commonInterests: 3),
-                Persona(name: "Juan, 19", imageName: "person1", commonInterests: 3),
-                Persona(name: "Pedro, 20", imageName: "person1", commonInterests: 3),
-                Persona(name: "María, 21", imageName: "person2", commonInterests: 5),
-                Persona(name: "Ana, 20", imageName: "person3", commonInterests: 2),
-                Persona(name: "Carlos, 22", imageName: "person4", commonInterests: 4),
-                Persona(name: "Sofia, 19", imageName: "person5", commonInterests: 6),
-                Persona(name: "Diego, 23", imageName: "person6", commonInterests: 1)
-            ]
-            
-            DispatchQueue.main.async {
-                self.recommendedUsers = fetchedUsers.shuffled() // Shuffle to simulate "new" recommendations
-                self.isLoading = false
+            let currentUid = Auth.auth().currentUser?.uid ?? ""
+            var query: Query = db.collection("users")
+
+            if let dest = destination, !dest.isEmpty {
+                query = query.whereField("destination", isEqualTo: dest)
             }
+
+            query = query.limit(to: 20)
+            let snapshot = try await query.getDocuments()
+
+            let profiles: [UserProfile] = snapshot.documents.compactMap { doc in
+                guard doc.documentID != currentUid else { return nil }
+                return try? doc.data(as: UserProfile.self)
+            }
+
+            recommendedProfiles = profiles.shuffled()
+            isLoading = false
         } catch {
             print("Error fetching users: \(error)")
-            DispatchQueue.main.async { self.isLoading = false }
+            isLoading = false
+        }
+    }
+
+    // MARK: - Search Users by display name
+    func searchUsers(query searchQuery: String) async -> [UserProfile] {
+        guard !searchQuery.isEmpty else { return [] }
+        do {
+            let snapshot = try await db.collection("users")
+                .whereField("displayName", isGreaterThanOrEqualTo: searchQuery)
+                .whereField("displayName", isLessThan: searchQuery + "\u{f8ff}")
+                .limit(to: 15)
+                .getDocuments()
+
+            return snapshot.documents.compactMap { try? $0.data(as: UserProfile.self) }
+        } catch {
+            print("Error searching users: \(error)")
+            return []
         }
     }
 }
