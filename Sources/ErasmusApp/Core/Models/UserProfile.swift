@@ -102,7 +102,8 @@ struct UserProfile: Codable, Identifiable {
             userPosts: [], // TODO: Load real posts
             userEvents: [], // TODO: Load real events
             photoURL: photoURL,
-            friendIds: friendIds
+            friendIds: friendIds,
+            followerIds: followerIds
         )
     }
 }
@@ -161,7 +162,8 @@ struct ExtendedUserProfile: Identifiable {
     let userEvents: [Evento]
     let photoURL: String?
     var friendIds: [String]
-    
+    var followerIds: [String]
+
     // Sample data
     static let sampleUser = ExtendedUserProfile(
         id: "sample_user_id",
@@ -181,6 +183,7 @@ struct ExtendedUserProfile: Identifiable {
         userPosts: [],
         userEvents: [],
         photoURL: nil,
-        friendIds: []
+        friendIds: [],
+        followerIds: []
     )
 }
