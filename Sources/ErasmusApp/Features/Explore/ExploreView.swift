@@ -581,9 +581,15 @@ struct UserDiscoveryCard: View {
             // Avatar
             Group {
                 if !user.photoURL.isEmpty, let url = URL(string: user.photoURL) {
-                    AsyncImage(url: url) { img in img.resizable().scaledToFill() } placeholder: { Color.gray.opacity(0.3) }
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let img): img.resizable().scaledToFill()
+                        case .failure: initialsAvatar(user.displayName)
+                        default: Color.gray.opacity(0.2)
+                        }
+                    }
                 } else {
-                    AsyncImage(url: URL(string: "https://picsum.photos/80/80?random=\(user.id.prefix(6))")) { img in img.resizable().scaledToFill() } placeholder: { Color.gray.opacity(0.3) }
+                    initialsAvatar(user.displayName)
                 }
             }
             .frame(width: 56, height: 56)
@@ -634,6 +640,19 @@ struct UserDiscoveryCard: View {
         .background(Color(UIColor.secondarySystemGroupedBackground))
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+    }
+}
+
+@ViewBuilder
+private func initialsAvatar(_ name: String) -> some View {
+    let initials = name.split(separator: " ").prefix(2).compactMap { $0.first }.map { String($0) }.joined()
+    let seed = abs(name.hashValue) % 6
+    let colors: [Color] = [.blue, .purple, .teal, .orange, .pink, .indigo]
+    ZStack {
+        colors[seed].opacity(0.8)
+        Text(initials.isEmpty ? "?" : initials)
+            .font(.system(size: 20, weight: .semibold))
+            .foregroundColor(.white)
     }
 }
 

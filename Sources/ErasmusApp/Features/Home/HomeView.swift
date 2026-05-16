@@ -277,13 +277,12 @@ struct ModernHeaderView: View {
                 HStack(spacing: 12) {
                     if groupManager.currentGroup != nil {
                         NavigationLink(destination: MyGroupView()) {
-                            Image(systemName: "person.3.fill")
-                                .font(.title3)
-                                .foregroundColor(.white)
+                            Image(systemName: "person.3")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundColor(.primary)
                                 .frame(width: 40, height: 40)
-                                .background(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                .background(Color(UIColor.secondarySystemBackground))
                                 .clipShape(Circle())
-                                .shadow(color: .blue.opacity(0.3), radius: 5, x: 0, y: 3)
                         }
                     }
                     

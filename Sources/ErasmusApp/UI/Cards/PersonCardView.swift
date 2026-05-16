@@ -12,17 +12,14 @@ struct PersonCardView: View {
                 // Profile image
                 Group {
                     if !profile.photoURL.isEmpty, let url = URL(string: profile.photoURL) {
-                        AsyncImage(url: url) { image in
-                            image.resizable().scaledToFill()
-                        } placeholder: {
-                            personPlaceholder
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image): image.resizable().scaledToFill()
+                            default: personPlaceholder
+                            }
                         }
                     } else {
-                        AsyncImage(url: URL(string: "https://picsum.photos/300/300?random=\(profile.id.prefix(8))")) { image in
-                            image.resizable().scaledToFill()
-                        } placeholder: {
-                            personPlaceholder
-                        }
+                        personPlaceholder
                     }
                 }
                 .frame(height: 140)

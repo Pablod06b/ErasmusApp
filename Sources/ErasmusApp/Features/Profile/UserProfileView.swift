@@ -483,10 +483,13 @@ struct UserProfileView: View {
                             .overlay(Circle().stroke(Color(UIColor.systemGroupedBackground), lineWidth: 2))
                     }
                 }
-                Text("Tenéis 3 amigos en común")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.leading, 8)
+                let commonCount = Set(user.friendIds).intersection(Set(authManager.currentUser?.friendIds ?? [])).count
+                if commonCount > 0 {
+                    Text("Tenéis \(commonCount) amigo\(commonCount == 1 ? "" : "s") en común")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.leading, 8)
+                }
                 Spacer()
             }
             
@@ -506,13 +509,13 @@ struct UserProfileView: View {
     // MARK: - Mini Stats (Glass Card)
     private var statsSection: some View {
         HStack(spacing: 0) {
-            StatItem(value: "12", title: "Recomend.")
+            StatItem(value: "\(userOwnPosts.filter { $0.type == .recommendation }.count)", title: "Recomend.")
             Divider().frame(height: 30).padding(.horizontal, 8)
-            StatItem(value: "\(user.eventsCount)", title: "Eventos")
+            StatItem(value: "\(userOwnPosts.filter { $0.type == .event }.count)", title: "Eventos")
             Divider().frame(height: 30).padding(.horizontal, 8)
-            StatItem(value: "3", title: "Planes")
+            StatItem(value: "\(userOwnPosts.filter { $0.type == .personalPlan }.count)", title: "Planes")
             Divider().frame(height: 30).padding(.horizontal, 8)
-            StatItem(value: "1.2k", title: "Seguidores")
+            StatItem(value: "\(user.followerIds.count)", title: "Seguidores")
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 12)
@@ -535,11 +538,11 @@ struct UserProfileView: View {
                     .font(.subheadline)
                     .foregroundColor(.primary)
                     .lineSpacing(4)
-            } else {
-                Text("Me encanta descubrir cafeterías escondidas y viajar improvisando.")
+            } else if isCurrentUser {
+                Text("Añade una bio en Editar Perfil para que otros Erasmus te conozcan mejor.")
                     .font(.subheadline)
-                    .foregroundColor(.primary)
-                    .lineSpacing(4)
+                    .foregroundColor(.secondary)
+                    .italic()
             }
             
             // Interests
@@ -551,7 +554,7 @@ struct UserProfileView: View {
                 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
-                        ForEach(user.interests.isEmpty ? ["🎉 Fiesta", "🌊 Playa", "☕ Cafés", "📸 Fotografía"] : user.interests, id: \.self) { interest in
+                        ForEach(user.interests, id: \.self) { interest in
                             Text(interest)
                                 .font(.caption)
                                 .padding(.horizontal, 12)
