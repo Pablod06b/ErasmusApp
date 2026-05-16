@@ -138,7 +138,7 @@ class PostManager: ObservableObject {
                 .limit(to: 50)
                 .getDocuments()
             return snapshot.documents.compactMap { try? $0.data(as: ErasmusPost.self) }
-                .sorted { $0.date > $1.date }
+                .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
         } catch {
             print("Error fetching user posts: \(error)")
             return []
