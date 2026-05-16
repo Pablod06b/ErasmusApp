@@ -101,7 +101,8 @@ struct UserProfile: Codable, Identifiable {
             connectionsCount: connectionsCount,
             userPosts: [], // TODO: Load real posts
             userEvents: [], // TODO: Load real events
-            photoURL: photoURL
+            photoURL: photoURL,
+            friendIds: friendIds
         )
     }
 }
@@ -159,6 +160,7 @@ struct ExtendedUserProfile: Identifiable {
     let userPosts: [ErasmusPost]
     let userEvents: [Evento]
     let photoURL: String?
+    var friendIds: [String]
     
     // Sample data
     static let sampleUser = ExtendedUserProfile(
@@ -172,12 +174,13 @@ struct ExtendedUserProfile: Identifiable {
         erasmusStartDate: "Sep 2025",
         languages: ["🇪🇸 Español", "🇮🇹 Italiano", "🇬🇧 Inglés"],
         interests: ["🎭 Cultura", "🍕 Gastronomía", "📸 Fotografía", "✈️ Viajes"],
-        isVerified: false, 
+        isVerified: false,
         postsCount: 24,
         eventsCount: 8,
         connectionsCount: 156,
         userPosts: [],
         userEvents: [],
-        photoURL: nil
+        photoURL: nil,
+        friendIds: []
     )
 }

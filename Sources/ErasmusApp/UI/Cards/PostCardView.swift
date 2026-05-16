@@ -7,6 +7,8 @@ struct PostCardView: View {
     @State private var showReportAlert = false
     @State private var showDetail = false
     @StateObject private var favoritesManager = FavoritesManager.shared
+    @StateObject private var postManager = PostManager.shared
+    @EnvironmentObject var authManager: FirebaseAuthManager
 
     private var isSaved: Bool { favoritesManager.isPostSaved(post.id.uuidString) }
 
@@ -59,6 +61,7 @@ struct PostCardView: View {
 
                 // Like Button
                 Button(action: {
+                    guard let userId = authManager.currentUser?.id else { return }
                     #if os(iOS)
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     #endif
@@ -69,6 +72,9 @@ struct PostCardView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         withAnimation { scale = 1.0 }
                     }
+                    Task {
+                        await postManager.toggleLike(postId: post.id.uuidString, userId: userId)
+                    }
                 }) {
                     Image(systemName: isLiked ? "heart.fill" : "heart")
                         .foregroundColor(isLiked ? .red : .secondary)
@@ -76,6 +82,12 @@ struct PostCardView: View {
                         .font(.system(size: 18))
                 }
                 .buttonStyle(PlainButtonStyle())
+                .task {
+                    if let userId = authManager.currentUser?.id {
+                        let (liked, _) = await postManager.fetchLikeStatus(postId: post.id.uuidString, userId: userId)
+                        isLiked = liked
+                    }
+                }
             }
             
             // Title

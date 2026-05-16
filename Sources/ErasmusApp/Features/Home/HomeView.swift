@@ -475,7 +475,11 @@ struct HomeTabView: View {
                 }
             }
             VStack(alignment: .leading, spacing: 16) {
-                if posts.isEmpty {
+                if isLoading && posts.isEmpty {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 60)
+                } else if posts.isEmpty {
                     EmptyStateView(
                         icon: "newspaper",
                         title: "No hay publicaciones",
@@ -509,36 +513,42 @@ struct HomeTabView: View {
     private var filteredCategoryFeed: some View {
         VStack(spacing: 20) {
             if selectedFilter == "Eventos" || selectedFilter == "Discotecas" {
-                 if eventosFiltrados.isEmpty {
-                     EmptyStateView(icon: "calendar.badge.exclamationmark", title: "No hay eventos", message: "Actualmente no hay eventos de esta categoría en \(selectedDestination).")
-                 } else {
-                     LazyVStack(spacing: 16) {
+                if isLoading && eventosFiltrados.isEmpty {
+                    ProgressView().frame(maxWidth: .infinity).padding(.top, 60)
+                } else if eventosFiltrados.isEmpty {
+                    EmptyStateView(icon: "calendar.badge.exclamationmark", title: "No hay eventos", message: "Actualmente no hay eventos de esta categoría en \(selectedDestination).")
+                } else {
+                    LazyVStack(spacing: 16) {
                         ForEach(eventosFiltrados) { evento in
                             EventCardView(evento: evento)
                         }
                     }
-                 }
+                }
             } else if selectedFilter == "Conocer" {
-                 if personas.isEmpty {
-                     EmptyStateView(icon: "person.2.slash", title: "Nadie nuevo por aquí", message: "No hemos encontrado personas nuevas para conocer en \(selectedDestination).")
-                 } else {
-                     LazyVStack(spacing: 16) {
+                if isLoading && personas.isEmpty {
+                    ProgressView().frame(maxWidth: .infinity).padding(.top, 60)
+                } else if personas.isEmpty {
+                    EmptyStateView(icon: "person.2.slash", title: "Nadie nuevo por aquí", message: "No hemos encontrado personas nuevas para conocer en \(selectedDestination).")
+                } else {
+                    LazyVStack(spacing: 16) {
                         ForEach(personas) { profile in
                             PersonCardView(profile: profile)
                                 .environmentObject(authManager)
                         }
                     }
-                 }
+                }
             } else {
-                 if posts.isEmpty {
-                     EmptyStateView(icon: "doc.text.magnifyingglass", title: "Nada por aquí", message: "Todavía no hay publicaciones en \(selectedDestination).")
-                 } else {
-                     LazyVStack(spacing: 16) {
+                if isLoading && posts.isEmpty {
+                    ProgressView().frame(maxWidth: .infinity).padding(.top, 60)
+                } else if posts.isEmpty {
+                    EmptyStateView(icon: "doc.text.magnifyingglass", title: "Nada por aquí", message: "Todavía no hay publicaciones en \(selectedDestination).")
+                } else {
+                    LazyVStack(spacing: 16) {
                         ForEach(posts) { post in
                             PostCardView(post: post)
                         }
                     }
-                 }
+                }
             }
         }
         .padding(.horizontal, 20)

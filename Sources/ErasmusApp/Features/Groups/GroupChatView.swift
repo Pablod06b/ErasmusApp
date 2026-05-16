@@ -57,7 +57,7 @@ struct GroupChatView: View {
                 .padding(.vertical, 8)
             }
             .onAppear {
-                chatManager.startListeningToMessages(groupId: group.id)
+                chatManager.startListeningToGroupMessages(groupId: group.id)
                 // We ensure members are fetched so we can map names
                 if groupManager.groupMembers.isEmpty {
                     Task { await groupManager.fetchMembers() }
@@ -70,9 +70,12 @@ struct GroupChatView: View {
     }
     
     private func sendMessage() {
-        guard !newMessageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        chatManager.sendGroupMessage(groupId: group.id, content: newMessageText)
+        let text = newMessageText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
         newMessageText = ""
+        Task {
+            await chatManager.sendGroupMessage(groupId: group.id, content: text)
+        }
     }
 }
 

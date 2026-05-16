@@ -97,44 +97,143 @@ class PostManager: ObservableObject {
     private func fetchPostBatch(destination: String?) async {
         do {
             var query: Query = db.collection("posts")
-            
+
             if let destination = destination {
                 query = query.whereField("destination", isEqualTo: destination)
             }
-            
+
             // Limit and Pagination
             query = query.limit(to: pageSize)
-            
+
             if let lastDoc = lastDocument {
                 query = query.start(afterDocument: lastDoc)
             }
-            
+
             let snapshot = try await query.getDocuments()
             let fetchedPosts = try snapshot.documents.compactMap { doc -> ErasmusPost? in
                 try doc.data(as: ErasmusPost.self)
             }
-            
+
             // Update cursor
             self.lastDocument = snapshot.documents.last
-            
+
             DispatchQueue.main.async {
-                // If it's a reload (lastDocument was nil at start of call but local var capture... 
-                // actually we check if we are appending or setting)
-                // Since this method is generic, let's look at `self.posts`
-                // BUT: We reset `self.posts = []` in fetchInitialPosts.
-                // However, doing that on MainActor async might race if we are not careful.
-                // Better approach: append to existing if lastDocument existed locally BEFORE this call? 
-                // No, simpler: check if the new batch belongs at the end.
-                
-                // For simplicity in this step: direct append.
-                // Note: fetchInitialPosts clears the array.
-                
                 self.posts.append(contentsOf: fetchedPosts)
                 self.isLoading = false
             }
         } catch {
             print("Error fetching posts: \(error)")
             DispatchQueue.main.async { self.isLoading = false }
+        }
+    }
+
+    // MARK: - Fetch Posts by User
+
+    /// Fetches all posts authored by a specific user, most-recent first.
+    func fetchUserPosts(userId: String) async -> [ErasmusPost] {
+        guard !userId.isEmpty else { return [] }
+        do {
+            let snapshot = try await db.collection("posts")
+                .whereField("userId", isEqualTo: userId)
+                .limit(to: 50)
+                .getDocuments()
+            return snapshot.documents.compactMap { try? $0.data(as: ErasmusPost.self) }
+                .sorted { $0.date > $1.date }
+        } catch {
+            print("Error fetching user posts: \(error)")
+            return []
+        }
+    }
+
+    // MARK: - Likes
+
+    /// Returns (isLiked, likeCount) for a post and current user
+    func fetchLikeStatus(postId: String, userId: String) async -> (Bool, Int) {
+        do {
+            let doc = try await db.collection("posts").document(postId).getDocument()
+            let likedBy = doc.data()?["likedBy"] as? [String] ?? []
+            return (likedBy.contains(userId), likedBy.count)
+        } catch {
+            print("Error fetching like status: \(error)")
+            return (false, 0)
+        }
+    }
+
+    /// Toggles the like for a user on a post. Returns new state (isLiked, likeCount).
+    @discardableResult
+    func toggleLike(postId: String, userId: String) async -> (Bool, Int) {
+        let ref = db.collection("posts").document(postId)
+        do {
+            let doc = try await ref.getDocument()
+            var likedBy = doc.data()?["likedBy"] as? [String] ?? []
+            let isCurrentlyLiked = likedBy.contains(userId)
+
+            if isCurrentlyLiked {
+                try await ref.updateData(["likedBy": FieldValue.arrayRemove([userId])])
+                likedBy.removeAll { $0 == userId }
+            } else {
+                try await ref.updateData(["likedBy": FieldValue.arrayUnion([userId])])
+                likedBy.append(userId)
+            }
+            return (!isCurrentlyLiked, likedBy.count)
+        } catch {
+            // If update fails (document missing field), set it
+            do {
+                let doc = try await ref.getDocument()
+                if doc.exists {
+                    try await ref.setData(["likedBy": [userId]], merge: true)
+                    return (true, 1)
+                }
+            } catch {}
+            print("Error toggling like: \(error)")
+            return (false, 0)
+        }
+    }
+
+    // MARK: - Comments
+
+    /// Fetches all comments for a post, ordered by creation date
+    func fetchComments(postId: String) async -> [PostComment] {
+        do {
+            let snapshot = try await db.collection("posts").document(postId)
+                .collection("comments")
+                .order(by: "createdAt", descending: false)
+                .getDocuments()
+            return snapshot.documents.compactMap { doc -> PostComment? in
+                let data = doc.data()
+                return PostComment(
+                    id: doc.documentID,
+                    postId: data["postId"] as? String ?? postId,
+                    userId: data["userId"] as? String ?? "",
+                    userName: data["userName"] as? String ?? "Usuario",
+                    userPhotoURL: data["userPhotoURL"] as? String,
+                    content: data["content"] as? String ?? "",
+                    createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
+                    likes: data["likes"] as? Int ?? 0
+                )
+            }
+        } catch {
+            print("Error fetching comments: \(error)")
+            return []
+        }
+    }
+
+    /// Adds a comment to a post in Firestore
+    func addComment(postId: String, comment: PostComment) async {
+        let ref = db.collection("posts").document(postId).collection("comments").document(comment.id)
+        let data: [String: Any] = [
+            "postId": comment.postId,
+            "userId": comment.userId,
+            "userName": comment.userName,
+            "userPhotoURL": comment.userPhotoURL as Any,
+            "content": comment.content,
+            "createdAt": Timestamp(date: comment.createdAt),
+            "likes": comment.likes
+        ]
+        do {
+            try await ref.setData(data)
+        } catch {
+            print("Error adding comment: \(error)")
         }
     }
 }

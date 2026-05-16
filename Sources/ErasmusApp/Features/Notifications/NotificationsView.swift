@@ -1,5 +1,27 @@
 import SwiftUI
 
+// MARK: - Swipe Action helpers (free functions to avoid type-check complexity)
+@ViewBuilder
+private func deleteButton(notification: AppNotification, manager: NotificationManager) -> some View {
+    Button(role: .destructive) {
+        if let id = notification.id { manager.deleteNotification(notificationId: id) }
+    } label: {
+        Label("Eliminar", systemImage: "trash")
+    }
+}
+
+@ViewBuilder
+private func markReadButton(notification: AppNotification, manager: NotificationManager) -> some View {
+    if !notification.isRead {
+        Button {
+            if let id = notification.id { manager.markAsRead(notificationId: id) }
+        } label: {
+            Label("Leída", systemImage: "envelope.open")
+        }
+        .tint(.blue)
+    }
+}
+
 struct NotificationsView: View {
     @StateObject private var manager = NotificationManager.shared
     @StateObject private var socialManager = SocialManager.shared
@@ -43,6 +65,12 @@ struct NotificationsView: View {
                                 if let id = notification.id {
                                     manager.markAsRead(notificationId: id)
                                 }
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                deleteButton(notification: notification, manager: manager)
+                            }
+                            .swipeActions(edge: .leading, allowsFullSwipe: notification.isRead == false) {
+                                markReadButton(notification: notification, manager: manager)
                             }
                         }
                     }
@@ -182,8 +210,15 @@ struct NotificationRow: View {
             do {
                 try await socialManager.acceptFriendRequest(requestId: requestId, fromUserId: fromUserId)
                 friendRequestHandled = true
-                if let id = notification.id { notificationManager.markAsRead(notificationId: id) }
-            } catch { print("Accept error: \(error)") }
+                // Delete notification after a short delay so user sees the ✓
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    if let id = notification.id {
+                        notificationManager.deleteNotification(notificationId: id)
+                    }
+                }
+            } catch {
+                print("Accept error: \(error)")
+            }
             isProcessing = false
         }
     }
@@ -196,8 +231,15 @@ struct NotificationRow: View {
             do {
                 try await socialManager.rejectFriendRequest(requestId: requestId, fromUserId: fromUserId)
                 friendRequestHandled = true
-                if let id = notification.id { notificationManager.markAsRead(notificationId: id) }
-            } catch { print("Reject error: \(error)") }
+                // Delete immediately on reject
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    if let id = notification.id {
+                        notificationManager.deleteNotification(notificationId: id)
+                    }
+                }
+            } catch {
+                print("Reject error: \(error)")
+            }
             isProcessing = false
         }
     }

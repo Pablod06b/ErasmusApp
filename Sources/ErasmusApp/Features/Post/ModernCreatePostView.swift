@@ -5,7 +5,8 @@ import PhotosUI
 struct ModernCreatePostView: View {
     @Binding var posts: [ErasmusPost]
     @Environment(\.dismiss) var dismiss
-    
+    @EnvironmentObject var authManager: FirebaseAuthManager
+
     @State private var selectedType: PostType = .event
     @State private var title = ""
     @State private var description = ""
@@ -13,32 +14,35 @@ struct ModernCreatePostView: View {
     @State private var destination = "Salamanca"
     @State private var category = ""
     @State private var contact = ""
-    @State private var imageName: String? = nil
     @State private var date = Date()
     @State private var isPaid = false
     @State private var price = ""
     @State private var allowSignups = true
     @State private var visibility: Visibility = .everyone
     @State private var isLoading = false
-    @State private var showingImagePicker = false
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var showError = false
+    @State private var errorMessage = ""
     #if canImport(UIKit)
     @State private var selectedImage: UIImage?
-    @State private var previewImage: UIImage?
+    @State private var loadedPreviewImage: UIImage?
     #endif
     @State private var showPreview = false
     @State private var currentStep = 0
-    
+    @State private var imageName: String?
+
     var canProceedToNextStep: Bool {
         switch currentStep {
-        case 0: return !title.isEmpty && !description.isEmpty
-        case 1: return true
+        case 0: return true  // type always selected
+        case 1: return !title.isEmpty && !description.isEmpty
         case 2: return true
         default: return false
         }
     }
-    
-    let destinations = ["Salamanca", "Madrid"]
+
+    let destinations = ["Salamanca", "Madrid", "Barcelona", "Valencia", "Roma",
+                        "París", "Berlín", "Lisboa", "Milán", "Ámsterdam",
+                        "Praga", "Viena", "Budapest", "Varsovia", "Dublín"]
     
     var body: some View {
         NavigationView {
@@ -91,7 +95,8 @@ struct ModernCreatePostView: View {
                                 visibility: $visibility,
                                 selectedImage: $selectedPhoto,
                                 imageName: $imageName,
-                                selectedType: selectedType
+                                selectedType: selectedType,
+                                loadedPreviewImage: $loadedPreviewImage
                             ))
                         default:
                             AnyView(EmptyView())
@@ -157,25 +162,26 @@ struct ModernCreatePostView: View {
             }
             .sheet(isPresented: $showPreview) {
                 ModernConfirmPostView(
-                    post: createPreviewPost(imageUrl: nil), // Image uploaded during publish
+                    post: createPreviewPost(imageUrl: nil),
                     isLoading: isLoading,
                     onCancel: { showPreview = false },
                     onConfirm: {
-                        Task {
-                            await publishPost()
-                        }
+                        Task { await publishPost() }
                     }
                 )
+            }
+            .alert("Error al publicar", isPresented: $showError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage)
             }
             .onChange(of: selectedPhoto) { newItem in
                 Task {
                     #if canImport(UIKit)
                     if let data = try? await newItem?.loadTransferable(type: Data.self),
                        let uiImage = UIImage(data: data) {
-                        let uniqueName = "user_image_\(UUID().uuidString).jpg"
-                        if let savedName = FileManager.saveImage(uiImage, withName: uniqueName) {
-                            self.selectedImage = uiImage
-                        }
+                        self.selectedImage = uiImage
+                        self.loadedPreviewImage = uiImage
                     }
                     #endif
                 }
@@ -183,23 +189,11 @@ struct ModernCreatePostView: View {
         }
     }
     
-    private var canProceed: Bool {
-        switch currentStep {
-        case 0:
-            return true // Type is always selected
-        case 1:
-            return !title.isEmpty && !description.isEmpty
-        case 2:
-            return !(isPaid && price.isEmpty)
-        default:
-            return false
-        }
-    }
-    
     private func createPreviewPost(imageUrl: String? = nil) -> ErasmusPost {
+        let userId = authManager.currentUser?.id ?? ""
         return ErasmusPost(
             id: UUID(),
-            userId: "current_user", // TODO: Get from auth manager
+            userId: userId,
             type: selectedType,
             title: title,
             description: description,
@@ -211,8 +205,8 @@ struct ModernCreatePostView: View {
             allowSignups: allowSignups,
             visibility: visibility,
             imageName: imageUrl,
-            category: nil,
-            contact: nil
+            category: category.isEmpty ? nil : category,
+            contact: contact.isEmpty ? nil : contact
         )
     }
 }
@@ -347,7 +341,12 @@ struct DetailsInputView: View {
                             Text(city).tag(city)
                         }
                     }
-                    .pickerStyle(.segmented)
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 10)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(8)
                 }
                 
                 // Date
@@ -394,6 +393,9 @@ struct OptionsAndImageView: View {
     @Binding var selectedImage: PhotosPickerItem?
     @Binding var imageName: String?
     let selectedType: PostType
+    #if canImport(UIKit)
+    @Binding var loadedPreviewImage: UIImage?
+    #endif
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -434,11 +436,9 @@ struct OptionsAndImageView: View {
                     }
                 }
                 .padding()
-                .padding()
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(12)
-                .cornerRadius(12)
-                
+
                 // Signups
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
@@ -452,11 +452,9 @@ struct OptionsAndImageView: View {
                     }
                 }
                 .padding()
-                .padding()
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(12)
-                .cornerRadius(12)
-                
+
                 // Visibility
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
@@ -466,7 +464,7 @@ struct OptionsAndImageView: View {
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
-                    
+
                     Picker("Visibilidad", selection: $visibility) {
                         ForEach(Visibility.allCases, id: \.self) { visibility in
                             Text(visibility.rawValue).tag(visibility)
@@ -475,9 +473,7 @@ struct OptionsAndImageView: View {
                     .pickerStyle(.segmented)
                 }
                 .padding()
-                .padding()
                 .background(Color.gray.opacity(0.1))
-                .cornerRadius(12)
                 .cornerRadius(12)
                 
                 // Image picker
@@ -489,26 +485,37 @@ struct OptionsAndImageView: View {
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
-                    
+
                     #if canImport(UIKit)
-                    // Image preview section would go here
-                    #endif
-                    
-                    PhotosPicker(selection: $selectedImage, matching: .images) {
-                            VStack(spacing: 8) {
-                                Image(systemName: "photo.badge.plus")
-                                    .font(.title2)
-                                    .foregroundColor(.blue)
-                                Text("Seleccionar imagen")
-                                    .font(.subheadline)
-                                    .foregroundColor(.blue)
-                            }
-                            .frame(height: 120)
+                    if let uiImg = loadedPreviewImage {
+                        Image(uiImage: uiImg)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 160)
                             .frame(maxWidth: .infinity)
-                            .background(Color.gray.opacity(0.1))
+                            .clipped()
                             .cornerRadius(12)
-                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.blue.opacity(0.4), lineWidth: 1)
+                            )
+                    }
+                    #endif
+
+                    PhotosPicker(selection: $selectedImage, matching: .images) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "photo.badge.plus")
+                                .font(.title3)
+                                .foregroundColor(.blue)
+                            Text(loadedPreviewImage == nil ? "Seleccionar imagen" : "Cambiar imagen")
+                                .font(.subheadline)
+                                .foregroundColor(.blue)
                         }
+                        .frame(height: 50)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue.opacity(0.08))
+                        .cornerRadius(12)
+                    }
                 }
             }
         }
@@ -561,9 +568,7 @@ struct CreatePostTextArea: View {
             TextEditor(text: $text)
                 .frame(minHeight: 100)
                 .padding(8)
-                .padding(8)
                 .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)
                 .cornerRadius(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
@@ -594,9 +599,7 @@ struct ModernConfirmPostView: View {
                             .foregroundColor(.secondary)
                     }
                     .padding()
-                    .padding()
                     .background(Color.gray.opacity(0.1))
-                    .cornerRadius(12)
                     .cornerRadius(12)
                     .padding(.horizontal, 20)
                     
@@ -666,9 +669,10 @@ extension ModernCreatePostView {
             showPreview = false
             dismiss()
         } catch {
-            print("Error publishing post: \(error)")
+            errorMessage = "No se pudo publicar. Comprueba tu conexión e inténtalo de nuevo."
+            showError = true
         }
-        
+
         isLoading = false
     }
 }

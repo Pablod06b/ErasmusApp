@@ -2,175 +2,281 @@ import Foundation
 import FirebaseFirestore
 import FirebaseAuth
 
+@MainActor
 class ChatManager: ObservableObject {
     static let shared = ChatManager()
     private let db = Firestore.firestore()
-    
+
     @Published var conversations: [Conversation] = []
     @Published var messages: [ChatMessage] = []
-    
+    @Published var isLoadingConversations = false
+    @Published var isLoadingMessages = false
+    @Published var messagesError: String? = nil
+
+    private var conversationsListener: ListenerRegistration?
+    private var messagesListener: ListenerRegistration?
+
     private init() {}
-    
-    // MARK: - User Search
-    func searchUsers(query: String) async -> [ChatUser] {
-        guard !query.isEmpty else { return [] }
-        do {
-            let snapshot = try await db.collection("users").getDocuments()
-            let allUsers = snapshot.documents.compactMap { doc -> ChatUser? in
-                let data = doc.data()
-                let id = doc.documentID
-                let name = data["displayName"] as? String ?? "Usuario"
-                let avatarUrl = data["photoURL"] as? String
-                let university = data["university"] as? String
-                return ChatUser(id: id, name: name, avatarUrl: avatarUrl, university: university)
-            }
-            
-            return allUsers.filter { $0.name.localizedCaseInsensitiveContains(query) && $0.id != Auth.auth().currentUser?.uid }
-        } catch {
-            print("Error searching users: \(error)")
-            return []
-        }
-    }
-    
+
     // MARK: - Conversations
+
     func startListeningToConversations() {
         guard let currentUserId = Auth.auth().currentUser?.uid else { return }
-        
-        db.collection("conversations")
+        isLoadingConversations = true
+
+        conversationsListener?.remove()
+        conversationsListener = db.collection("conversations")
             .whereField("participants", arrayContains: currentUserId)
-            .addSnapshotListener { snapshot, error in
-                guard let documents = snapshot?.documents, error == nil else {
-                    print("Error fetching conversations: \(error?.localizedDescription ?? "Unknown")")
-                    return
-                }
-                
-                self.conversations = documents.compactMap { doc -> Conversation? in
-                    try? doc.data(as: Conversation.self)
-                }.sorted(by: { $0.lastMessageTime > $1.lastMessageTime })
-                
-                // Here we might need to fetch user details for 'otherUser' if we don't store them denormalized
-                // For now, we assume we might need a separate step or enrich this model.
-                // Simplified for this step: We might populate 'otherUser' with a placeholder or fetch it.
-                // Let's create a helper to fetch other participant details.
-                Task {
-                    await self.enrichConversationsWithUsers()
-                }
-            }
-    }
-    
-    private func enrichConversationsWithUsers() async {
-        guard let currentUserId = Auth.auth().currentUser?.uid else { return }
-        
-        var enrichedConversations = self.conversations
-        
-        for i in 0..<enrichedConversations.count {
-            let participants = enrichedConversations[i].participants
-            if let otherUserId = participants.first(where: { $0 != currentUserId }) {
-                // Fetch user data from 'users' collection (assuming it exists or using Auth profiles if stored)
-                // If we don't have a 'users' collection yet, we might use placeholders or basic auth info if readable
-                // For this MVP, we will try to fetch from a 'users' collection which is standard.
-                // If it fails, we fall back to a placeholder.
-                
-                // Placeholder logic for now until User Profile is robust
-                enrichedConversations[i].otherUser = ChatUser(id: otherUserId, name: "User", avatarUrl: nil, university: nil)
-            }
-        }
-        
-        DispatchQueue.main.async {
-            self.conversations = enrichedConversations
-        }
-    }
-    
-    // MARK: - Messages
-    func startListeningToMessages(conversationId: String? = nil, groupId: String? = nil) {
-        let collectionRef: CollectionReference
-        
-        if let groupId = groupId {
-            // Group Chat Path: groups/{groupId}/messages
-            collectionRef = db.collection("groups").document(groupId).collection("messages")
-        } else if let conversationId = conversationId {
-            // DM Path: conversations/{conversationId}/messages
-            collectionRef = db.collection("conversations").document(conversationId).collection("messages")
-        } else {
-            return
-        }
-        
-        collectionRef
-            .order(by: "timestamp", descending: false)
-            .addSnapshotListener { snapshot, error in
-                guard let documents = snapshot?.documents, error == nil else {
-                    print("Error fetching messages: \(error?.localizedDescription ?? "Unknown")")
-                    return
-                }
-                
-                self.messages = documents.compactMap { doc -> ChatMessage? in
-                    try? doc.data(as: ChatMessage.self)
+            .order(by: "lastMessageTime", descending: true)
+            .addSnapshotListener { [weak self] snapshot, error in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    if let error = error {
+                        print("Conversations listener error: \(error.localizedDescription)")
+                        self.isLoadingConversations = false
+                        return
+                    }
+                    guard let documents = snapshot?.documents else {
+                        self.isLoadingConversations = false
+                        return
+                    }
+                    let convs = documents.compactMap { try? $0.data(as: Conversation.self) }
+                    self.isLoadingConversations = false
+                    await self.enrichConversations(convs, currentUserId: currentUserId)
                 }
             }
     }
-    
-    func sendMessage(conversationId: String, content: String) {
-        guard let currentUserId = Auth.auth().currentUser?.uid else { return }
-        
-        let newMessage = ChatMessage(
-            id: nil, // auto-generated
-            senderId: currentUserId,
-            content: content,
-            timestamp: Date(),
-            type: .text
-        )
-        
+
+    func stopListeningToConversations() {
+        conversationsListener?.remove()
+        conversationsListener = nil
+    }
+
+    private func enrichConversations(_ convs: [Conversation], currentUserId: String) async {
+        var enriched = convs
+        for i in 0..<enriched.count {
+            guard let otherUserId = enriched[i].participants.first(where: { $0 != currentUserId }) else { continue }
+            if let user = await fetchChatUser(userId: otherUserId) {
+                enriched[i].otherUser = user
+            }
+        }
+        conversations = enriched
+    }
+
+    private func fetchChatUser(userId: String) async -> ChatUser? {
         do {
-            // Add message
-            try db.collection("conversations").document(conversationId).collection("messages").addDocument(from: newMessage)
-            
-            // Update conversation last message
-            db.collection("conversations").document(conversationId).updateData([
-                "lastMessage": content,
-                "lastMessageTime": Date()
-            ])
+            let doc = try await db.collection("users").document(userId).getDocument()
+            guard doc.exists, let data = doc.data() else { return nil }
+            return ChatUser(
+                id: userId,
+                name: data["displayName"] as? String ?? "Usuario",
+                avatarUrl: data["photoURL"] as? String,
+                university: data["university"] as? String
+            )
         } catch {
-            print("Error sending message: \(error)")
+            return nil
         }
     }
-    
-    func sendGroupMessage(groupId: String, content: String) {
-        guard let currentUserId = Auth.auth().currentUser?.uid else { return }
-        
-        let newMessage = ChatMessage(
-            id: nil,
-            senderId: currentUserId,
-            content: content,
-            timestamp: Date(),
-            type: .text
-        )
-        
-        do {
-            try db.collection("groups").document(groupId).collection("messages").addDocument(from: newMessage)
-        } catch {
-            print("Error sending group message: \(error)")
-        }
-    }
-    func createNewChat(with otherUserId: String) async -> String? {
+
+    // MARK: - Create or Get Conversation
+
+    func getOrCreateConversation(with otherUserId: String) async -> String? {
         guard let currentUserId = Auth.auth().currentUser?.uid else { return nil }
-        
-        // Check if conversation already exists (implementation trade-off: client side check or complex query)
-        // For simple MVP: Create a new one. Ideal: Check query.
-        
-        let newConversation = Conversation(
-            id: nil,
-            participants: [currentUserId, otherUserId],
-            lastMessage: "",
-            lastMessageTime: Date(),
-            otherUser: nil
-        )
-        
+
+        let conversationId = [currentUserId, otherUserId].sorted().joined(separator: "_")
+        let ref = db.collection("conversations").document(conversationId)
+
         do {
-            let ref = try db.collection("conversations").addDocument(from: newConversation)
-            return ref.documentID
+            let doc = try await ref.getDocument()
+            if !doc.exists {
+                try await ref.setData([
+                    "participants": [currentUserId, otherUserId],
+                    "lastMessage": "",
+                    "lastMessageTime": FieldValue.serverTimestamp(),
+                    "unreadCount": 0
+                ])
+            }
+            return conversationId
         } catch {
             print("Error creating conversation: \(error)")
             return nil
+        }
+    }
+
+    // MARK: - Direct Messages
+
+    func startListeningToMessages(conversationId: String) {
+        guard !conversationId.isEmpty else { return }
+        isLoadingMessages = true
+        messagesError = nil
+        messages = []
+        messagesListener?.remove()
+
+        messagesListener = db.collection("conversations")
+            .document(conversationId)
+            .collection("messages")
+            .order(by: "timestamp", descending: false)
+            .addSnapshotListener { [weak self] snapshot, error in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    if let error = error {
+                        print("Messages listener error: \(error.localizedDescription)")
+                        self.messagesError = error.localizedDescription
+                        self.isLoadingMessages = false
+                        return
+                    }
+                    guard let documents = snapshot?.documents else {
+                        self.isLoadingMessages = false
+                        return
+                    }
+                    self.messages = documents.compactMap { doc -> ChatMessage? in
+                        // Manual decode to handle Firestore Timestamp → Date
+                        let data = doc.data()
+                        guard
+                            let senderId = data["senderId"] as? String,
+                            let content = data["content"] as? String,
+                            let ts = data["timestamp"] as? Timestamp
+                        else { return nil }
+                        let typeRaw = data["type"] as? String ?? "text"
+                        let msgType = MessageType(rawValue: typeRaw) ?? .text
+                        return ChatMessage(
+                            id: doc.documentID,
+                            senderId: senderId,
+                            content: content,
+                            timestamp: ts.dateValue(),
+                            type: msgType
+                        )
+                    }
+                    self.isLoadingMessages = false
+                }
+            }
+    }
+
+    // MARK: - Group Messages
+
+    func startListeningToGroupMessages(groupId: String) {
+        guard !groupId.isEmpty else { return }
+        messages = []
+        isLoadingMessages = false
+        messagesError = nil
+        messagesListener?.remove()
+
+        messagesListener = db.collection("groups")
+            .document(groupId)
+            .collection("messages")
+            .order(by: "timestamp", descending: false)
+            .addSnapshotListener { [weak self] snapshot, error in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    if let error = error {
+                        print("Group messages error: \(error.localizedDescription)")
+                        return
+                    }
+                    guard let documents = snapshot?.documents else { return }
+                    self.messages = documents.compactMap { doc -> ChatMessage? in
+                        let data = doc.data()
+                        guard
+                            let senderId = data["senderId"] as? String,
+                            let content = data["content"] as? String,
+                            let ts = data["timestamp"] as? Timestamp
+                        else { return nil }
+                        let typeRaw = data["type"] as? String ?? "text"
+                        let msgType = MessageType(rawValue: typeRaw) ?? .text
+                        return ChatMessage(
+                            id: doc.documentID,
+                            senderId: senderId,
+                            content: content,
+                            timestamp: ts.dateValue(),
+                            type: msgType
+                        )
+                    }
+                }
+            }
+    }
+
+    func stopListeningToMessages() {
+        messagesListener?.remove()
+        messagesListener = nil
+        messages = []
+        isLoadingMessages = false
+        messagesError = nil
+    }
+
+    // MARK: - Send Message
+
+    func sendMessage(conversationId: String, content: String) async -> Bool {
+        guard let currentUserId = Auth.auth().currentUser?.uid,
+              !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              !conversationId.isEmpty else { return false }
+
+        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        let messageData: [String: Any] = [
+            "senderId": currentUserId,
+            "content": trimmed,
+            "timestamp": FieldValue.serverTimestamp(),
+            "type": "text"
+        ]
+
+        do {
+            try await db.collection("conversations")
+                .document(conversationId)
+                .collection("messages")
+                .addDocument(data: messageData)
+
+            try await db.collection("conversations").document(conversationId).updateData([
+                "lastMessage": trimmed,
+                "lastMessageTime": FieldValue.serverTimestamp()
+            ])
+            return true
+        } catch {
+            print("Error sending message: \(error.localizedDescription)")
+            return false
+        }
+    }
+
+    func sendGroupMessage(groupId: String, content: String) async {
+        guard let currentUserId = Auth.auth().currentUser?.uid,
+              !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+
+        let trimmed = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        let messageData: [String: Any] = [
+            "senderId": currentUserId,
+            "content": trimmed,
+            "timestamp": FieldValue.serverTimestamp(),
+            "type": "text"
+        ]
+
+        do {
+            try await db.collection("groups")
+                .document(groupId)
+                .collection("messages")
+                .addDocument(data: messageData)
+        } catch {
+            print("Error sending group message: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Search Users
+
+    func searchUsers(query: String) async -> [ChatUser] {
+        guard let currentUserId = Auth.auth().currentUser?.uid else { return [] }
+        do {
+            let snapshot = try await db.collection("users").limit(to: 50).getDocuments()
+            return snapshot.documents.compactMap { doc -> ChatUser? in
+                guard doc.documentID != currentUserId else { return nil }
+                let data = doc.data()
+                let name = data["displayName"] as? String ?? "Usuario"
+                guard query.isEmpty || name.localizedCaseInsensitiveContains(query) else { return nil }
+                return ChatUser(
+                    id: doc.documentID,
+                    name: name,
+                    avatarUrl: data["photoURL"] as? String,
+                    university: data["university"] as? String
+                )
+            }
+        } catch {
+            print("Error searching users: \(error)")
+            return []
         }
     }
 }

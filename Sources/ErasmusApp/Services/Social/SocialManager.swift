@@ -94,22 +94,34 @@ class SocialManager: ObservableObject {
         let targetRef = db.collection("users").document(targetId)
         try await targetRef.updateData(["pendingFriendRequestIds": FieldValue.arrayUnion([myId])])
 
+        // relatedItemId = request.id so the receiver can accept/reject using it
         await sendNotification(
             toUserId: targetId,
             type: .friendRequest,
             title: "Solicitud de amistad",
             message: "\(myName) quiere ser tu amigo",
-            relatedItemId: myId
+            relatedItemId: request.id
         )
     }
 
     func acceptFriendRequest(requestId: String, fromUserId: String) async throws {
         guard let myId = Auth.auth().currentUser?.uid else { return }
+
+        // Find the actual friend request document (requestId may be the doc ID or we search by fromUserId)
+        let requestsRef = db.collection("users").document(myId).collection("friendRequests")
+        var actualRequestId = requestId
+
+        // Verify the request document exists; if not, find it by fromUserId
+        let directDoc = try? await requestsRef.document(requestId).getDocument()
+        if directDoc?.exists != true {
+            let query = try? await requestsRef.whereField("fromUserId", isEqualTo: fromUserId).getDocuments()
+            actualRequestId = query?.documents.first?.documentID ?? requestId
+        }
+
         let batch = db.batch()
 
         // Update request status
-        let requestRef = db.collection("users").document(myId)
-            .collection("friendRequests").document(requestId)
+        let requestRef = requestsRef.document(actualRequestId)
         batch.updateData(["status": "accepted"], forDocument: requestRef)
 
         // Add each other as friends
@@ -140,9 +152,16 @@ class SocialManager: ObservableObject {
     func rejectFriendRequest(requestId: String, fromUserId: String) async throws {
         guard let myId = Auth.auth().currentUser?.uid else { return }
 
-        try await db.collection("users").document(myId)
-            .collection("friendRequests").document(requestId).updateData(["status": "rejected"])
+        let requestsRef = db.collection("users").document(myId).collection("friendRequests")
+        var actualRequestId = requestId
 
+        let directDoc = try? await requestsRef.document(requestId).getDocument()
+        if directDoc?.exists != true {
+            let query = try? await requestsRef.whereField("fromUserId", isEqualTo: fromUserId).getDocuments()
+            actualRequestId = query?.documents.first?.documentID ?? requestId
+        }
+
+        try await requestsRef.document(actualRequestId).updateData(["status": "rejected"])
         try await db.collection("users").document(myId)
             .updateData(["pendingFriendRequestIds": FieldValue.arrayRemove([fromUserId])])
     }
@@ -315,6 +334,31 @@ class SocialManager: ObservableObject {
                 )
             }
         } catch {
+            return []
+        }
+    }
+
+    // MARK: - Fetch Friends
+
+    /// Fetches UserProfile objects for a list of friend IDs
+    func fetchFriends(ids: [String]) async -> [UserProfile] {
+        guard !ids.isEmpty else { return [] }
+        do {
+            // Firestore 'in' queries support up to 30 items
+            let batches = stride(from: 0, to: ids.count, by: 30).map {
+                Array(ids[$0..<min($0 + 30, ids.count)])
+            }
+            var results: [UserProfile] = []
+            for batch in batches {
+                let snapshot = try await db.collection("users")
+                    .whereField(FieldPath.documentID(), in: batch)
+                    .getDocuments()
+                let profiles = snapshot.documents.compactMap { try? $0.data(as: UserProfile.self) }
+                results.append(contentsOf: profiles)
+            }
+            return results
+        } catch {
+            print("Error fetching friends: \(error)")
             return []
         }
     }

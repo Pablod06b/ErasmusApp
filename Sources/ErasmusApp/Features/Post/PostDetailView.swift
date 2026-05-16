@@ -1,17 +1,20 @@
 // PostDetailView.swift
 import SwiftUI
 import MapKit
+import FirebaseFirestore
 
 struct PostDetailView: View {
     let post: ErasmusPost
     @EnvironmentObject var authManager: FirebaseAuthManager
     @StateObject private var favoritesManager = FavoritesManager.shared
+    @StateObject private var postManager = PostManager.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var comments: [PostComment] = []
     @State private var newComment = ""
     @State private var isLiked = false
-    @State private var likesCount = Int.random(in: 5...120)
+    @State private var likesCount = 0
+    @State private var isLiking = false
     @State private var showShareSheet = false
     @State private var showReportAlert = false
 
@@ -51,12 +54,25 @@ struct PostDetailView: View {
             .navigationBarHidden(true)
             .overlay(alignment: .top) { navBar }
             .overlay(alignment: .bottom) { commentInputBar }
-            .alert("Post reportado", isPresented: $showReportAlert) {
-                Button("OK", role: .cancel) {}
+            .alert("Reportar publicación", isPresented: $showReportAlert) {
+                Button("Reportar", role: .destructive) {
+                    Task { await reportPost() }
+                }
+                Button("Cancelar", role: .cancel) {}
             } message: {
-                Text("Gracias por tu reporte. Nuestro equipo lo revisará.")
+                Text("¿Quieres reportar esta publicación? Nuestro equipo la revisará.")
             }
-            .onAppear { loadSampleComments() }
+            .onAppear {
+                Task {
+                    let userId = authManager.currentUser?.id ?? ""
+                    let (liked, count) = await postManager.fetchLikeStatus(
+                        postId: post.id.uuidString, userId: userId
+                    )
+                    isLiked = liked
+                    likesCount = count
+                    comments = await postManager.fetchComments(postId: post.id.uuidString)
+                }
+            }
         }
     }
 
@@ -125,9 +141,15 @@ struct PostDetailView: View {
         HStack(spacing: 20) {
             // Like
             Button(action: {
+                guard !isLiking, let userId = authManager.currentUser?.id else { return }
+                isLiking = true
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
                     isLiked.toggle()
                     likesCount += isLiked ? 1 : -1
+                }
+                Task {
+                    await postManager.toggleLike(postId: post.id.uuidString, userId: userId)
+                    isLiking = false
                 }
             }) {
                 HStack(spacing: 6) {
@@ -141,6 +163,7 @@ struct PostDetailView: View {
                 }
             }
             .buttonStyle(PlainButtonStyle())
+            .disabled(isLiking)
 
             // Comment
             HStack(spacing: 6) {
@@ -420,25 +443,44 @@ struct PostDetailView: View {
         }
     }
 
+    private func reportPost() async {
+        let db = Firestore.firestore()
+        let reporterId = authManager.currentUser?.id ?? "anonymous"
+        let postId = post.id.uuidString
+
+        // Mark the post itself as reported
+        try? await db.collection("posts").document(postId)
+            .updateData(["isReported": true])
+
+        // Store a report document for moderation
+        let reportData: [String: Any] = [
+            "postId": postId,
+            "reporterId": reporterId,
+            "postTitle": post.title,
+            "postUserId": post.userId,
+            "createdAt": Timestamp(date: Date())
+        ]
+        try? await db.collection("reports").addDocument(data: reportData)
+    }
+
     private func submitComment() {
-        guard let user = authManager.currentUser else { return }
+        guard let user = authManager.currentUser, !newComment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        let trimmed = newComment.trimmingCharacters(in: .whitespacesAndNewlines)
         let comment = PostComment(
             postId: post.id.uuidString,
             userId: user.id,
             userName: user.displayName,
             userPhotoURL: user.photoURL.isEmpty ? nil : user.photoURL,
-            content: newComment,
+            content: trimmed,
             createdAt: Date()
         )
-        comments.insert(comment, at: 0)
+        // Optimistic update
+        comments.append(comment)
         newComment = ""
-    }
-
-    private func loadSampleComments() {
-        comments = [
-            PostComment(postId: post.id.uuidString, userId: "u1", userName: "Carlos M.", userPhotoURL: nil, content: "¡Qué buena pinta! ¿Hay sitio para más?", createdAt: Date().addingTimeInterval(-3600)),
-            PostComment(postId: post.id.uuidString, userId: "u2", userName: "Ana G.", userPhotoURL: nil, content: "Me encanta este sitio, lo recomiendo 100% 🔥", createdAt: Date().addingTimeInterval(-7200))
-        ]
+        // Persist to Firebase
+        Task {
+            await postManager.addComment(postId: post.id.uuidString, comment: comment)
+        }
     }
 }
 

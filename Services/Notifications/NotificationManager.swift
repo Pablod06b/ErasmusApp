@@ -64,14 +64,28 @@ class NotificationManager: ObservableObject {
     func markAllAsRead() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let batch = db.batch()
-        
+
         for notif in notifications where !notif.isRead {
             if let id = notif.id {
                 let ref = db.collection("users").document(uid).collection("notifications").document(id)
                 batch.updateData(["isRead": true], forDocument: ref)
             }
         }
-        
+
         batch.commit()
+    }
+
+    func deleteNotification(notificationId: String) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        db.collection("users").document(uid).collection("notifications").document(notificationId).delete()
+        // Optimistic UI update
+        notifications.removeAll { $0.id == notificationId }
+    }
+
+    func deleteNotifications(at offsets: IndexSet) {
+        let toDelete = offsets.compactMap { notifications[$0].id }
+        for id in toDelete {
+            deleteNotification(notificationId: id)
+        }
     }
 }

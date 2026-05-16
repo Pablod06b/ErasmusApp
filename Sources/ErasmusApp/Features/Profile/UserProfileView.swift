@@ -34,6 +34,14 @@ struct UserProfileView: View {
     @State private var isFriendRequestSent = false
     @State private var isFriend = false
     @State private var socialActionLoading = false
+
+    // Friends list
+    @State private var friendProfiles: [UserProfile] = []
+    @State private var isLoadingFriends = false
+
+    // User's own posts (fetched specifically for this profile)
+    @State private var userOwnPosts: [ErasmusPost] = []
+    @State private var isLoadingUserPosts = false
     
     // Geometry reading for parallax
     let headerHeight: CGFloat = 350
@@ -209,7 +217,15 @@ struct UserProfileView: View {
         }
         .onAppear {
             loadSocialStatus()
+            Task { await loadUserPosts() }
         }
+    }
+
+    private func loadUserPosts() async {
+        guard !isLoadingUserPosts else { return }
+        isLoadingUserPosts = true
+        userOwnPosts = await postManager.fetchUserPosts(userId: user.id)
+        isLoadingUserPosts = false
     }
 
     private func loadSocialStatus() {
@@ -630,26 +646,36 @@ struct UserProfileView: View {
     // MARK: Tab: Publicaciones
     private var userPostsFeed: some View {
         LazyVStack(spacing: 16) {
-            let myPosts = postManager.posts.filter { $0.userId == user.id && $0.type != .event }
-            if myPosts.isEmpty {
-                emptyGlassState(icon: "doc.text", title: "Sin publicaciones", desc: "No hay actividad reciente.")
+            if isLoadingUserPosts {
+                ProgressView()
+                    .padding(.top, 40)
             } else {
-                ForEach(myPosts) { post in
-                    PostCardView(post: post)
+                let myPosts = userOwnPosts.filter { $0.type != .event }
+                if myPosts.isEmpty {
+                    emptyGlassState(icon: "doc.text", title: "Sin publicaciones", desc: "No hay actividad reciente.")
+                } else {
+                    ForEach(myPosts) { post in
+                        PostCardView(post: post)
+                    }
                 }
             }
         }
     }
-    
+
     // MARK: Tab: Eventos
     private var userEventsFeed: some View {
         LazyVStack(spacing: 16) {
-            let myEvents = postManager.posts.filter { $0.userId == user.id && $0.type == .event }
-            if myEvents.isEmpty {
-                emptyGlassState(icon: "calendar", title: "Sin eventos", desc: "Aún no ha organizado ningún evento.")
+            if isLoadingUserPosts {
+                ProgressView()
+                    .padding(.top, 40)
             } else {
-                ForEach(myEvents) { event in
-                    PostCardView(post: event)
+                let myEvents = userOwnPosts.filter { $0.type == .event }
+                if myEvents.isEmpty {
+                    emptyGlassState(icon: "calendar", title: "Sin eventos", desc: "Aún no ha organizado ningún evento.")
+                } else {
+                    ForEach(myEvents) { event in
+                        PostCardView(post: event)
+                    }
                 }
             }
         }
@@ -667,31 +693,72 @@ struct UserProfileView: View {
     }
     
     private var userRecommendationsFeed: some View {
-        emptyGlassState(icon: "star", title: "Sin recomendaciones", desc: "No ha compartido ninguna recomendación local.")
+        LazyVStack(spacing: 16) {
+            let recs = userOwnPosts.filter { $0.type == .recommendation }
+            if recs.isEmpty {
+                emptyGlassState(icon: "star", title: "Sin recomendaciones", desc: "No ha compartido ninguna recomendación local.")
+            } else {
+                ForEach(recs) { rec in
+                    PostCardView(post: rec)
+                }
+            }
+        }
     }
     
     private var userFriendsFeed: some View {
-        LazyVStack(spacing: 12) {
-            ForEach(0..<4, id: \.self) { i in
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(width: 50, height: 50)
-                        .overlay(Image(systemName: "person.fill").foregroundColor(.gray))
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Amigo \(i+1)")
-                            .font(.headline)
-                        Text("📍 Roma • 🇪🇸 España")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+        Group {
+            if isLoadingFriends {
+                ProgressView("Cargando amigos...")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 40)
+            } else if friendProfiles.isEmpty {
+                emptyGlassState(icon: "person.2", title: "Sin amigos aún", desc: "Conecta con otros erasmus enviando solicitudes de amistad.")
+            } else {
+                LazyVStack(spacing: 12) {
+                    ForEach(friendProfiles) { friend in
+                        HStack(spacing: 12) {
+                            if !friend.photoURL.isEmpty, let url = URL(string: friend.photoURL) {
+                                AsyncImage(url: url) { img in
+                                    img.resizable().scaledToFill()
+                                } placeholder: {
+                                    Circle().fill(Color.gray.opacity(0.2))
+                                }
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
+                            } else {
+                                Circle()
+                                    .fill(Color.blue.opacity(0.2))
+                                    .frame(width: 50, height: 50)
+                                    .overlay(
+                                        Text(String(friend.displayName.prefix(1)))
+                                            .font(.headline)
+                                            .foregroundColor(.blue)
+                                    )
+                            }
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(friend.displayName)
+                                    .font(.headline)
+                                if !friend.destination.isEmpty {
+                                    Text("📍 \(friend.destination)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            Spacer()
+                        }
+                        .padding()
+                        .background(Color(UIColor.secondarySystemGroupedBackground))
+                        .cornerRadius(16)
                     }
-                    Spacer()
                 }
-                .padding()
-                .background(Color(UIColor.secondarySystemGroupedBackground))
-                .cornerRadius(16)
             }
+        }
+        .task {
+            guard !isLoadingFriends else { return }
+            isLoadingFriends = true
+            friendProfiles = await socialManager.fetchFriends(ids: user.friendIds)
+            isLoadingFriends = false
         }
     }
     

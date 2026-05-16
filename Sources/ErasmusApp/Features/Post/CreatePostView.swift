@@ -640,6 +640,7 @@ struct CreatePostOptionsView: View {
     @Binding var posts: [ErasmusPost] // Receive posts binding
     @Binding var selectedFilter: String // Receive filter binding
     @State private var selectedType: PostType?
+    @State private var showEventCreate = false
     
     // Grid layout for cards
     let columns = [
@@ -673,7 +674,7 @@ struct CreatePostOptionsView: View {
                             color: .purple,
                             title: "Evento",
                             subtitle: "Fiestas, viajes",
-                            action: { selectedType = .event }
+                            action: { showEventCreate = true }
                         )
                         
                         // Plan Abierto (Plan Personal)
@@ -716,14 +717,15 @@ struct CreatePostOptionsView: View {
                 }
             }
             .sheet(item: $selectedType) { type in
-                // For now, we reuse the existing CreatePostView, 
-                // passing the selected type. We will refactor CreatePostView later.
                 CreatePostView(
-                    posts: $posts, 
-                    showSheet: $showSheet, 
-                    selectedFilter: $selectedFilter, 
+                    posts: $posts,
+                    showSheet: $showSheet,
+                    selectedFilter: $selectedFilter,
                     preselectedType: type
                 )
+            }
+            .sheet(isPresented: $showEventCreate) {
+                EventCreateView()
             }
         }
     }

@@ -49,12 +49,21 @@ struct ChatMessage: Identifiable, Codable {
     let content: String
     let timestamp: Date
     let type: MessageType
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case senderId
         case content
         case timestamp
         case type
+    }
+
+    // Manual init used by ChatManager to decode from raw Firestore data
+    init(id: String?, senderId: String, content: String, timestamp: Date, type: MessageType) {
+        self.id = id
+        self.senderId = senderId
+        self.content = content
+        self.timestamp = timestamp
+        self.type = type
     }
 }
