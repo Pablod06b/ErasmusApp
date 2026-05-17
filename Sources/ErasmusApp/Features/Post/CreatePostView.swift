@@ -6,8 +6,7 @@ import MapKit
 
 struct CreatePostView: View {
     @Binding var posts: [ErasmusPost]
-    @Binding var showSheet: Bool // Add binding to control parent sheet
-    @Binding var selectedFilter: String // Add binding to update filter
+    @Binding var showSheet: Bool
     @State private var selectedType: PostType
     
     // Core Fields
@@ -42,10 +41,9 @@ struct CreatePostView: View {
 
     let destinations = ["Salamanca", "Madrid", "Barcelona", "Valencia"]
     
-    init(posts: Binding<[ErasmusPost]>, showSheet: Binding<Bool>, selectedFilter: Binding<String>, preselectedType: PostType = .event) {
+    init(posts: Binding<[ErasmusPost]>, showSheet: Binding<Bool>, preselectedType: PostType = .event) {
         self._posts = posts
         self._showSheet = showSheet
-        self._selectedFilter = selectedFilter
         self._selectedType = State(initialValue: preselectedType)
     }
 
@@ -334,15 +332,6 @@ struct CreatePostView: View {
                             message: "Tu \(newPost.type.rawValue) se ha publicado correctamente.",
                             targetUserId: currentUserId
                         )
-                    }
-                    
-                    switch newPost.type {
-                    case .event: selectedFilter = "Eventos"
-                    case .recommendation: selectedFilter = "Recomendación"
-                    case .personalPlan: selectedFilter = "Plan personal"
-                    case .announcement: selectedFilter = "Anuncio"
-                    case .openMessage: selectedFilter = "Mensaje abierto"
-                    default: selectedFilter = "Todos"
                     }
                     
                     isUploading = false
@@ -639,8 +628,7 @@ struct ConfirmPostView: View {
 
 struct CreatePostOptionsView: View {
     @Binding var showSheet: Bool
-    @Binding var posts: [ErasmusPost] // Receive posts binding
-    @Binding var selectedFilter: String // Receive filter binding
+    @Binding var posts: [ErasmusPost]
     @State private var selectedType: PostType?
     @State private var showEventCreate = false
     
@@ -722,7 +710,6 @@ struct CreatePostOptionsView: View {
                 CreatePostView(
                     posts: $posts,
                     showSheet: $showSheet,
-                    selectedFilter: $selectedFilter,
                     preselectedType: type
                 )
             }
