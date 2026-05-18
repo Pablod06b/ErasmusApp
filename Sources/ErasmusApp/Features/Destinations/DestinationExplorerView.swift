@@ -292,7 +292,7 @@ struct DestinationCityCard: View {
             [.pink, .purple], [.indigo, .blue], [.teal, .green],
             [.red, .orange], [.purple, .pink]
         ]
-        return gradients[abs(id.hashValue) % gradients.count]
+        return gradients[((id.hashValue % gradients.count) + gradients.count) % gradients.count]
     }
 }
 

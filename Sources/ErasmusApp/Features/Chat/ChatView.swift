@@ -515,7 +515,7 @@ struct UserAvatarView: View {
 
     private var avatarColor: Color {
         let colors: [Color] = [.blue, .purple, .teal, .orange, .pink, .green, .indigo]
-        let index = abs(name.hashValue) % colors.count
+        let index = ((name.hashValue % colors.count) + colors.count) % colors.count
         return colors[index]
     }
 }

@@ -439,7 +439,7 @@ struct CityCardView: View {
             [.red, .orange],
             [.purple, .pink]
         ]
-        let index = abs(id.hashValue) % gradients.count
+        let index = ((id.hashValue % gradients.count) + gradients.count) % gradients.count
         return gradients[index]
     }
 }
@@ -646,7 +646,7 @@ struct UserDiscoveryCard: View {
 @ViewBuilder
 private func initialsAvatar(_ name: String) -> some View {
     let initials = name.split(separator: " ").prefix(2).compactMap { $0.first }.map { String($0) }.joined()
-    let seed = abs(name.hashValue) % 6
+    let seed = ((name.hashValue % 6) + 6) % 6
     let colors: [Color] = [.blue, .purple, .teal, .orange, .pink, .indigo]
     ZStack {
         colors[seed].opacity(0.8)

@@ -393,9 +393,8 @@ struct HomeTabView: View {
     var onLoadMore: () async -> Void = {}
 
     @State private var refreshSeed: Int = 0
+    @State private var feedItems: [FeedItem] = []
     @EnvironmentObject var authManager: FirebaseAuthManager
-
-    var feedItems: [FeedItem] { buildFeed() }
 
     var body: some View {
         ScrollView {
@@ -442,8 +441,21 @@ struct HomeTabView: View {
         }
         .refreshable {
             refreshSeed += 1
+            feedItems = buildFeed()
             await onLoadMore()
         }
+        .onAppear { feedItems = buildFeed() }
+        .onChange(of: selectedSort) { _ in
+            withAnimation(.easeInOut(duration: 0.25)) {
+                feedItems = buildFeed()
+            }
+            #if os(iOS)
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            #endif
+        }
+        .onChange(of: posts.count) { _ in feedItems = buildFeed() }
+        .onChange(of: eventos.count) { _ in feedItems = buildFeed() }
+        .onChange(of: personas.count) { _ in feedItems = buildFeed() }
     }
 
     private func buildFeed() -> [FeedItem] {
@@ -500,12 +512,15 @@ struct HomeTabView: View {
 
     private func shuffledMix(posts: [ErasmusPost], events: [Evento], people: [UserProfile], seed: Int) -> [FeedItem] {
         var all: [FeedItem] = posts.map { .post($0) }
-            + eventos.prefix(min(eventos.count, posts.count / 2 + 1)).map { .event($0) }
-            + personas.prefix(min(personas.count, posts.count / 4 + 1)).map { .person($0) }
-        // Deterministic shuffle using seed
+            + eventos.prefix(min(eventos.count, max(1, posts.count / 2))).map { .event($0) }
+            + personas.prefix(min(personas.count, max(1, posts.count / 4))).map { .person($0) }
+        guard all.count > 1 else { return all }
+        // Fisher-Yates shuffle with LCG — overflow-safe via UInt arithmetic
+        var rng = UInt(bitPattern: seed == 0 ? 12345 : seed)
         for i in stride(from: all.count - 1, through: 1, by: -1) {
-            let j = (i * 6364136223846793005 + seed * 1442695040888963407 + 12345) % (i + 1)
-            all.swapAt(i, abs(j))
+            rng = rng &* 6364136223846793005 &+ 1442695040888963407
+            let j = Int(rng >> 33) % (i + 1)   // upper bits, always in [0, i]
+            all.swapAt(i, j)
         }
         return all
     }
@@ -653,8 +668,23 @@ struct FeedPostCard: View {
     }
 
     private func loadLocalImage(named name: String) -> UIImage? {
-        guard let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
-        return UIImage(contentsOfFile: docs.appendingPathComponent(name).path)
+        LocalImageCache.shared.image(for: name)
+    }
+}
+
+// MARK: - Local image cache (avoids hitting disk every render)
+final class LocalImageCache {
+    static let shared = LocalImageCache()
+    private let cache = NSCache<NSString, UIImage>()
+    private init() { cache.countLimit = 80 }
+
+    func image(for name: String) -> UIImage? {
+        let key = name as NSString
+        if let cached = cache.object(forKey: key) { return cached }
+        guard let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
+              let img = UIImage(contentsOfFile: docs.appendingPathComponent(name).path) else { return nil }
+        cache.setObject(img, forKey: key)
+        return img
     }
 }
 
@@ -853,21 +883,23 @@ struct FeedPersonCard: View {
         .buttonStyle(PlainButtonStyle())
     }
 
-    private var initialsView: some View {
+    private var initials: String {
         let words = profile.displayName.split(separator: " ")
-        let initials = words.prefix(2).compactMap { $0.first }.map { String($0) }.joined()
+        return words.prefix(2).compactMap { $0.first }.map { String($0) }.joined()
+    }
+
+    private var avatarColor: Color {
         let colors: [Color] = [.blue, .purple, .pink, .orange, .green, .teal]
-        let colorIndex = abs(profile.displayName.hashValue) % colors.count
-        return ZStack {
-            colors[colorIndex].opacity(0.25)
+        let idx = ((profile.displayName.hashValue % colors.count) + colors.count) % colors.count
+        return colors[idx]
+    }
+
+    private var initialsView: some View {
+        ZStack {
+            avatarColor.opacity(0.25)
             Text(initials.isEmpty ? "?" : initials)
                 .font(.title2).fontWeight(.bold)
-                .foregroundColor(colors[colorIndex])
+                .foregroundColor(avatarColor)
         }
-        .eraseToAnyView()
     }
-}
-
-private extension View {
-    func eraseToAnyView() -> AnyView { AnyView(self) }
 }
