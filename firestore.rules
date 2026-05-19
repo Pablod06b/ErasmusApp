@@ -1,0 +1,132 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function isParticipant(participants) {
+      return isSignedIn() && request.auth.uid in participants;
+    }
+
+    // ---------- users ----------
+    // Perfiles son públicos para descubrir gente; solo el dueño puede modificar
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+
+      // Notificaciones del usuario: cualquiera autenticado puede crear (otro usuario
+      // te notifica de un like/mensaje); solo el dueño puede leer/borrar
+      match /notifications/{notifId} {
+        allow read: if isOwner(userId);
+        allow create: if isSignedIn();
+        allow update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+
+      // Friend requests recibidas: el remitente las crea, el dueño las lee/borra
+      match /friendRequests/{requestId} {
+        allow read: if isOwner(userId);
+        allow create: if isSignedIn() && request.resource.data.fromUserId == request.auth.uid;
+        allow update, delete: if isOwner(userId);
+      }
+
+      // Sent requests: solo el propio usuario
+      match /sentRequests/{requestId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Favoritos: solo el dueño
+      match /favorites/{itemId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // ---------- posts ----------
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        // Permitir marcar como reportado o togglear likes a otros usuarios
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isReported', 'likes', 'likesCount'])
+      );
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      match /comments/{commentId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      }
+    }
+
+    // ---------- events ----------
+    match /events/{eventId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // ---------- open plans ----------
+    match /openPlans/{postId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+
+      match /participants/{userId} {
+        allow read: if isSignedIn();
+        // Solo te puedes apuntar/desapuntar a ti mismo
+        allow write: if isOwner(userId);
+      }
+    }
+
+    // ---------- conversations (DMs) ----------
+    match /conversations/{convId} {
+      allow read: if isParticipant(resource.data.participants);
+      allow create: if isSignedIn() &&
+        request.auth.uid in request.resource.data.participants;
+      allow update: if isParticipant(resource.data.participants);
+      allow delete: if false;
+
+      match /messages/{msgId} {
+        allow read: if isParticipant(get(/databases/$(database)/documents/conversations/$(convId)).data.participants);
+        allow create: if isSignedIn() &&
+          request.resource.data.senderId == request.auth.uid &&
+          isParticipant(get(/databases/$(database)/documents/conversations/$(convId)).data.participants);
+        allow update, delete: if isSignedIn() && resource.data.senderId == request.auth.uid;
+      }
+    }
+
+    // ---------- groups ----------
+    match /groups/{groupId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() &&
+        (request.auth.uid in resource.data.memberIds || request.auth.uid == resource.data.ownerId);
+      allow delete: if isSignedIn() && request.auth.uid == resource.data.ownerId;
+
+      match /messages/{msgId} {
+        allow read: if isSignedIn() &&
+          request.auth.uid in get(/databases/$(database)/documents/groups/$(groupId)).data.memberIds;
+        allow create: if isSignedIn() &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.auth.uid in get(/databases/$(database)/documents/groups/$(groupId)).data.memberIds;
+        allow update, delete: if isSignedIn() && resource.data.senderId == request.auth.uid;
+      }
+    }
+
+    // ---------- reports ----------
+    // Write-only: cualquiera autenticado puede reportar; solo el admin SDK lee
+    match /reports/{reportId} {
+      allow read: if false;
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+  }
+}

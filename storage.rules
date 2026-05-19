@@ -1,0 +1,57 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ---------- helpers ----------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    function maxSize(mb) {
+      return request.resource.size < mb * 1024 * 1024;
+    }
+
+    // Profile images: ruta contiene userId, solo el dueño puede escribir
+    match /profile_images/{userId}.jpg {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn()
+        && request.auth.uid == userId
+        && isImage()
+        && maxSize(5);
+    }
+
+    // Posts: el path es posts/{postId}.jpg — el postId es UUID generado por la app.
+    // Cualquier autenticado puede subir su propia imagen de post.
+    // TODO futuro: migrar a posts/{userId}/{postId}.jpg para verificar autoría.
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isImage() && maxSize(10);
+    }
+
+    // Events: el path incluye el uid del subidor → fácil de verificar
+    match /events/{userId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn()
+        && request.auth.uid == userId
+        && isImage()
+        && maxSize(10);
+    }
+
+    // Chat attachments (futuro): chat/{conversationId}/{userId}/{file}
+    match /chat/{conversationId}/{userId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn()
+        && request.auth.uid == userId
+        && isImage()
+        && maxSize(10);
+    }
+
+    // Cualquier otra ruta: denegado por defecto
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
