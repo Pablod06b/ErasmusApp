@@ -1,11 +1,16 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseAuth
+import FirebaseStorage
+#if canImport(UIKit)
+import UIKit
+#endif
 
 @MainActor
 class ChatManager: ObservableObject {
     static let shared = ChatManager()
     private let db = Firestore.firestore()
+    private let storage = Storage.storage()
 
     @Published var conversations: [Conversation] = []
     @Published var messages: [ChatMessage] = []
@@ -17,6 +22,11 @@ class ChatManager: ObservableObject {
     private var messagesListener: ListenerRegistration?
 
     private init() {}
+
+    deinit {
+        conversationsListener?.remove()
+        messagesListener?.remove()
+    }
 
     // MARK: - Conversations
 
@@ -209,6 +219,15 @@ class ChatManager: ObservableObject {
         messagesError = nil
     }
 
+    /// Marca la conversación como leída en este momento por el usuario actual.
+    /// Llamar al abrir ChatDetailView.
+    func markConversationAsRead(conversationId: String) async {
+        guard let uid = Auth.auth().currentUser?.uid, !conversationId.isEmpty else { return }
+        try? await db.collection("conversations").document(conversationId).updateData([
+            "lastReadAt.\(uid)": FieldValue.serverTimestamp()
+        ])
+    }
+
     // MARK: - Send Message
 
     func sendMessage(conversationId: String, content: String) async -> Bool {
@@ -260,6 +279,44 @@ class ChatManager: ObservableObject {
             return false
         }
     }
+
+    #if canImport(UIKit)
+    /// Sube una imagen a Storage y crea un mensaje tipo "image" con la URL en `content`.
+    func sendImageMessage(conversationId: String, image: UIImage) async -> Bool {
+        guard let currentUserId = Auth.auth().currentUser?.uid,
+              !conversationId.isEmpty,
+              let data = image.jpegData(compressionQuality: 0.8) else { return false }
+        let fileName = "\(UUID().uuidString).jpg"
+        let path = "chat/\(conversationId)/\(currentUserId)/\(fileName)"
+        let ref = storage.reference().child(path)
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        do {
+            _ = try await ref.putDataAsync(data, metadata: metadata)
+            let urlStr = try await ref.downloadURL().absoluteString
+
+            try await db.collection("conversations")
+                .document(conversationId)
+                .collection("messages")
+                .addDocument(data: [
+                    "senderId": currentUserId,
+                    "content": urlStr,
+                    "timestamp": FieldValue.serverTimestamp(),
+                    "type": "image"
+                ])
+
+            try await db.collection("conversations").document(conversationId).updateData([
+                "lastMessage": "📷 Foto",
+                "lastMessageTime": FieldValue.serverTimestamp()
+            ])
+            return true
+        } catch {
+            print("Error sending image: \(error.localizedDescription)")
+            AppErrorManager.shared.report("No se pudo enviar la imagen.", icon: "photo.fill")
+            return false
+        }
+    }
+    #endif
 
     func sendGroupMessage(groupId: String, content: String) async {
         guard let currentUserId = Auth.auth().currentUser?.uid,

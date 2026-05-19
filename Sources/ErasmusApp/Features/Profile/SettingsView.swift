@@ -20,6 +20,8 @@ struct SettingsView: View {
     @State private var privateAccount = false
     @State private var showOnlineStatus = true
     @State private var notificationsEnabled = true
+    @State private var messageNotifsEnabled = true
+    @State private var eventNotifsEnabled = true
 
     var body: some View {
         NavigationView {
@@ -32,8 +34,8 @@ struct SettingsView: View {
                     SettingsRowView(icon: "key.fill", title: "Cambiar contraseña", iconColor: .blue) {
                         showPasswordResetAlert = true
                     }
-                    SettingsRowView(icon: "envelope.fill", title: "Cambiar email", iconColor: .blue) {
-                        showEmailChangeAlert = true
+                    NavigationLink(destination: EmailChangeView().environmentObject(authManager)) {
+                        settingsRow(icon: "envelope.fill", title: "Cambiar email", color: .blue)
                     }
                 }
 
@@ -82,8 +84,24 @@ struct SettingsView: View {
                         Task { try? await authManager.updateUserProfile(data: ["permissions.allowNotifications": value]) }
                     }
                     if notificationsEnabled {
-                        SettingsRowView(icon: "message.fill", title: "Notificaciones de mensajes", iconColor: .orange) {}
-                        SettingsRowView(icon: "calendar.badge.clock", title: "Notificaciones de eventos", iconColor: .orange) {}
+                        Toggle(isOn: $messageNotifsEnabled) {
+                            HStack {
+                                Image(systemName: "message.fill").foregroundColor(.orange)
+                                Text("Notificaciones de mensajes")
+                            }
+                        }
+                        .onChange(of: messageNotifsEnabled) { value in
+                            Task { try? await authManager.updateUserProfile(data: ["permissions.allowMessageNotifications": value]) }
+                        }
+                        Toggle(isOn: $eventNotifsEnabled) {
+                            HStack {
+                                Image(systemName: "calendar.badge.clock").foregroundColor(.orange)
+                                Text("Notificaciones de eventos")
+                            }
+                        }
+                        .onChange(of: eventNotifsEnabled) { value in
+                            Task { try? await authManager.updateUserProfile(data: ["permissions.allowEventNotifications": value]) }
+                        }
                     }
                 }
                 
@@ -121,19 +139,13 @@ struct SettingsView: View {
                         .foregroundColor(.red)
                     }
                     
-                    if isProcessing {
+                    NavigationLink(destination: DeleteAccountView().environmentObject(authManager)) {
                         HStack {
+                            Image(systemName: "trash.fill")
+                                .foregroundColor(.red)
+                            Text("Eliminar cuenta definitivamente")
+                                .foregroundColor(.red)
                             Spacer()
-                            ProgressView()
-                            Spacer()
-                        }
-                    } else {
-                        Button(action: { showDeleteAccountAlert = true }) {
-                            HStack {
-                                Image(systemName: "trash.fill")
-                                Text("Eliminar cuenta definitivamente")
-                            }
-                            .foregroundColor(.red)
                         }
                     }
                 }
@@ -154,14 +166,7 @@ struct SettingsView: View {
         } message: {
             Text("¿Estás seguro de que quieres cerrar tu sesión actual?")
         }
-        .alert("Eliminar Cuenta", isPresented: $showDeleteAccountAlert) {
-            Button("Cancelar", role: .cancel) { }
-            Button("Eliminar", role: .destructive) {
-                performDeleteAccount()
-            }
-        } message: {
-            Text("Esta acción es irreversible. Se eliminarán todos tus mensajes, posts y fotos permanentemente.")
-        }
+        // Antiguo alert eliminado — ahora se usa DeleteAccountView (flujo completo con reauth + CF).
         .alert("Pausar Cuenta", isPresented: $showPauseAccountAlert) {
             Button("Cancelar", role: .cancel) { }
             Button("Pausar", role: .destructive) {
@@ -218,6 +223,8 @@ struct SettingsView: View {
         privateAccount = permissions.isPrivateAccount
         showOnlineStatus = permissions.showOnlineStatus
         notificationsEnabled = permissions.allowNotifications
+        messageNotifsEnabled = permissions.allowMessageNotifications ?? true
+        eventNotifsEnabled = permissions.allowEventNotifications ?? true
     }
     
     private func sendPasswordReset() {

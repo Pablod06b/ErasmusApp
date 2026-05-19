@@ -17,6 +17,10 @@ class SocialManager: ObservableObject {
 
     private init() {}
 
+    deinit {
+        requestsListener?.remove()
+    }
+
     // MARK: - Block / Unblock
 
     /// Bloquea un usuario: deja de seguirlo en ambas direcciones, lo añade a mi lista de bloqueados.

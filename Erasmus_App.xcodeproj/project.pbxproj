@@ -13,10 +13,10 @@
 		2C04199440E5AFA4267621C7 /* GoogleSignInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F64893F4E89ABDB0E65B0C /* GoogleSignInHelper.swift */; };
 		30DA6A080C264A6C45BBCAC0 /* OpenPlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA63352294E728D50C6AC31 /* OpenPlanDetailView.swift */; };
 		40EF67946FFBA68D1EA10555 /* DestinationExplorerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD4BBDA6F3A204DB3CCB004 /* DestinationExplorerView.swift */; };
+		62CBD6E10EFC451F92E761DC /* EventCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2829E7DACFBF4DB49430CD1A /* EventCreateView.swift */; };
 		7C520AAF59F1F6D1E8BE375E /* LocationSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A545073930DB66CE5837D48 /* LocationSearchViewModel.swift */; };
 		81959742023FF26D122ACBED /* GroupChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFA789B0BF18A7DA9E784F8 /* GroupChatView.swift */; };
 		831C34712EEB9BD700E33724 /* FirebaseConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C343A2EEB9BD700E33724 /* FirebaseConfig.swift */; };
-		AA1234560000000000000002 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1234560000000000000001 /* NavigationRouter.swift */; };
 		831C34742EEB9BD700E33724 /* ModernCreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34582EEB9BD700E33724 /* ModernCreatePostView.swift */; };
 		831C34772EEB9BD700E33724 /* ModernOnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34462EEB9BD700E33724 /* ModernOnboardingFlow.swift */; };
 		831C34782EEB9BD700E33724 /* CreatePostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831C34572EEB9BD700E33724 /* CreatePostView.swift */; };
@@ -56,17 +56,20 @@
 		8399C54A2EF43FC7001BC9C6 /* GroupManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8399C53E2EF43FC7001BC9C6 /* GroupManager.swift */; };
 		83BE67312EECF03800364DBE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 83BE672F2EECEF9000364DBE /* GoogleService-Info.plist */; };
 		83E4BF152FA02B1000C04300 /* LiquidGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E4BF142FA02B1000C04300 /* LiquidGlass.swift */; };
-		62CBD6E10EFC451F92E761DC /* EventCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2829E7DACFBF4DB49430CD1A /* EventCreateView.swift */; };
-		AB1234560000000000000003 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1234560000000000000004 /* EventDetailView.swift */; };
 		84D453862864F72CE39030DE /* GroupCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA51465D7F5D39BF34F0883 /* GroupCreateView.swift */; };
 		8CF90CD7663DB5B81BDB5A84 /* PostDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C377D978A878D8D169040DA8 /* PostDetailView.swift */; };
 		8E400CB91F21AC68F9AA4CF4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA44DBF82DBF80AD31CB8C99 /* SettingsView.swift */; };
+		9C92615225BAD69AF1F4764D /* SocialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660605F5B2C252C4242036AB /* SocialModels.swift */; };
+		9FE8915E1CCD5152A9FAD883 /* FavoritesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEDF721358466BD3D2232C7 /* FavoritesManager.swift */; };
+		AA1234560000000000000002 /* NavigationRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1234560000000000000001 /* NavigationRouter.swift */; };
+		AB1234560000000000000003 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1234560000000000000004 /* EventDetailView.swift */; };
+		AB2E2E64CAD62DA37D5E52B4 /* SocialMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4036D301070C0E988509CF /* SocialMapView.swift */; };
 		AC1234560000000000000005 /* BlockedUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1234560000000000000006 /* BlockedUsersView.swift */; };
 		AD1234560000000000000007 /* AppErrorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1234560000000000000008 /* AppErrorManager.swift */; };
 		AE1234560000000000000009 /* SupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE123456000000000000000A /* SupportViews.swift */; };
-		9C92615225BAD69AF1F4764D /* SocialModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660605F5B2C252C4242036AB /* SocialModels.swift */; };
-		9FE8915E1CCD5152A9FAD883 /* FavoritesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEDF721358466BD3D2232C7 /* FavoritesManager.swift */; };
-		AB2E2E64CAD62DA37D5E52B4 /* SocialMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4036D301070C0E988509CF /* SocialMapView.swift */; };
+		AF123456000000000000000B /* FriendRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF123456000000000000000C /* FriendRequestsView.swift */; };
+		B012345600000000000000D /* EmailChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B012345600000000000000E /* EmailChangeView.swift */; };
+		B112345600000000000000F /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11234560000000000000010 /* DeleteAccountView.swift */; };
 		B5D2219365489B66E392FB23 /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1B08EC0D750C64AC52C16E /* FavoritesView.swift */; };
 		B798A4E0EECC471F1C6FDD3F /* AppleSignInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72917690F718C843DF651197 /* AppleSignInHelper.swift */; };
 		B9682A26F7560430478D22BA /* MyGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD57CA0625B88EED47686BA /* MyGroupView.swift */; };
@@ -111,9 +114,8 @@
 		0E4E72CA7ADCAFD690F9F4F6 /* ExploreView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExploreView.swift; path = Sources/ErasmusApp/Features/Explore/ExploreView.swift; sourceTree = SOURCE_ROOT; };
 		14C9892409450B5DF0AAEE1B /* Pods-Erasmus_App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Erasmus_App.release.xcconfig"; path = "Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App.release.xcconfig"; sourceTree = "<group>"; };
 		1FE9D4A6B3EAF0B9A2A3768B /* NotificationManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationManager.swift; path = Sources/ErasmusApp/Services/Notifications/NotificationManager.swift; sourceTree = "<group>"; };
-		2BD4BBDA6F3A204DB3CCB004 /* DestinationExplorerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DestinationExplorerView.swift; path = Sources/ErasmusApp/Features/Destinations/DestinationExplorerView.swift; sourceTree = SOURCE_ROOT; };
 		2829E7DACFBF4DB49430CD1A /* EventCreateView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventCreateView.swift; path = Sources/ErasmusApp/Features/Events/EventCreateView.swift; sourceTree = SOURCE_ROOT; };
-		AB1234560000000000000004 /* EventDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventDetailView.swift; path = Sources/ErasmusApp/Features/Events/EventDetailView.swift; sourceTree = SOURCE_ROOT; };
+		2BD4BBDA6F3A204DB3CCB004 /* DestinationExplorerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DestinationExplorerView.swift; path = Sources/ErasmusApp/Features/Destinations/DestinationExplorerView.swift; sourceTree = SOURCE_ROOT; };
 		2DA51465D7F5D39BF34F0883 /* GroupCreateView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GroupCreateView.swift; path = ../Sources/ErasmusApp/Features/Groups/GroupCreateView.swift; sourceTree = "<group>"; };
 		2E874BC79FF8AAA5DA3422C4 /* NotificationsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationsView.swift; path = Sources/ErasmusApp/Features/Notifications/NotificationsView.swift; sourceTree = "<group>"; };
 		4A545073930DB66CE5837D48 /* LocationSearchViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocationSearchViewModel.swift; path = Sources/ErasmusApp/Features/Location/LocationSearchViewModel.swift; sourceTree = "<group>"; };
@@ -126,7 +128,6 @@
 		831C34382EEB9BD700E33724 /* Erasmus_App.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Erasmus_App.json; sourceTree = "<group>"; };
 		831C34392EEB9BD700E33724 /* Erasmus_AppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Erasmus_AppApp.swift; sourceTree = "<group>"; };
 		831C343A2EEB9BD700E33724 /* FirebaseConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseConfig.swift; sourceTree = "<group>"; };
-		AA1234560000000000000001 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
 		831C343E2EEB9BD700E33724 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		831C343F2EEB9BD700E33724 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		831C34422EEB9BD700E33724 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
@@ -171,15 +172,20 @@
 		8FF19CDAA721EC592A202BEE /* SocialManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SocialManager.swift; path = Sources/ErasmusApp/Services/Social/SocialManager.swift; sourceTree = SOURCE_ROOT; };
 		9AD57CA0625B88EED47686BA /* MyGroupView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MyGroupView.swift; path = ../Sources/ErasmusApp/Features/Groups/MyGroupView.swift; sourceTree = "<group>"; };
 		9DE0DC2E9322612B44F532D7 /* Pods_Erasmus_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Erasmus_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA1234560000000000000001 /* NavigationRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationRouter.swift; sourceTree = "<group>"; };
+		AB1234560000000000000004 /* EventDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EventDetailView.swift; path = Sources/ErasmusApp/Features/Events/EventDetailView.swift; sourceTree = SOURCE_ROOT; };
 		ABA63352294E728D50C6AC31 /* OpenPlanDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OpenPlanDetailView.swift; path = Sources/ErasmusApp/Features/Plans/OpenPlanDetailView.swift; sourceTree = SOURCE_ROOT; };
+		AC1234560000000000000006 /* BlockedUsersView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BlockedUsersView.swift; path = ../Sources/ErasmusApp/Features/Profile/BlockedUsersView.swift; sourceTree = "<group>"; };
+		AD1234560000000000000008 /* AppErrorManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppErrorManager.swift; path = ../Sources/ErasmusApp/Services/Errors/AppErrorManager.swift; sourceTree = "<group>"; };
+		AE123456000000000000000A /* SupportViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SupportViews.swift; path = ../Sources/ErasmusApp/Features/Profile/SupportViews.swift; sourceTree = "<group>"; };
+		AF123456000000000000000C /* FriendRequestsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FriendRequestsView.swift; path = ../Sources/ErasmusApp/Features/Social/FriendRequestsView.swift; sourceTree = "<group>"; };
+		B012345600000000000000E /* EmailChangeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EmailChangeView.swift; path = ../Sources/ErasmusApp/Features/Profile/EmailChangeView.swift; sourceTree = "<group>"; };
+		B11234560000000000000010 /* DeleteAccountView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DeleteAccountView.swift; path = ../Sources/ErasmusApp/Features/Profile/DeleteAccountView.swift; sourceTree = "<group>"; };
 		C377D978A878D8D169040DA8 /* PostDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PostDetailView.swift; path = Sources/ErasmusApp/Features/Post/PostDetailView.swift; sourceTree = SOURCE_ROOT; };
 		CD3A72937D4D5C8877B74823 /* NotificationModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationModel.swift; path = Sources/ErasmusApp/Core/Models/NotificationModel.swift; sourceTree = "<group>"; };
 		D3309C48B75AFC285E3B349F /* GroupFeaturesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GroupFeaturesView.swift; path = Sources/ErasmusApp/Features/Groups/GroupFeaturesView.swift; sourceTree = SOURCE_ROOT; };
 		D8CC82BD15FB8C962A9FDDC4 /* Pods-Erasmus_App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Erasmus_App.debug.xcconfig"; path = "Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App.debug.xcconfig"; sourceTree = "<group>"; };
 		EA44DBF82DBF80AD31CB8C99 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = ../Sources/ErasmusApp/Features/Profile/SettingsView.swift; sourceTree = "<group>"; };
-		AC1234560000000000000006 /* BlockedUsersView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BlockedUsersView.swift; path = ../Sources/ErasmusApp/Features/Profile/BlockedUsersView.swift; sourceTree = "<group>"; };
-		AD1234560000000000000008 /* AppErrorManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppErrorManager.swift; path = ../Sources/ErasmusApp/Services/Errors/AppErrorManager.swift; sourceTree = "<group>"; };
-		AE123456000000000000000A /* SupportViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SupportViews.swift; path = ../Sources/ErasmusApp/Features/Profile/SupportViews.swift; sourceTree = "<group>"; };
 		FBEDF721358466BD3D2232C7 /* FavoritesManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FavoritesManager.swift; path = Sources/ErasmusApp/Services/Favorites/FavoritesManager.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -644,6 +650,9 @@
 				AC1234560000000000000006 /* BlockedUsersView.swift */,
 				AD1234560000000000000008 /* AppErrorManager.swift */,
 				AE123456000000000000000A /* SupportViews.swift */,
+				AF123456000000000000000C /* FriendRequestsView.swift */,
+				B012345600000000000000E /* EmailChangeView.swift */,
+				B11234560000000000000010 /* DeleteAccountView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -835,13 +844,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Erasmus_App/Pods-Erasmus_App-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -924,6 +929,9 @@
 				AC1234560000000000000005 /* BlockedUsersView.swift in Sources */,
 				AD1234560000000000000007 /* AppErrorManager.swift in Sources */,
 				AE1234560000000000000009 /* SupportViews.swift in Sources */,
+				AF123456000000000000000B /* FriendRequestsView.swift in Sources */,
+				B012345600000000000000D /* EmailChangeView.swift in Sources */,
+				B112345600000000000000F /* DeleteAccountView.swift in Sources */,
 				B9682A26F7560430478D22BA /* MyGroupView.swift in Sources */,
 				81959742023FF26D122ACBED /* GroupChatView.swift in Sources */,
 				9C92615225BAD69AF1F4764D /* SocialModels.swift in Sources */,

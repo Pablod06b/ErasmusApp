@@ -1,5 +1,6 @@
 // ChatView.swift
 import SwiftUI
+import PhotosUI
 
 // MARK: - Chat List (Mensajes tab)
 struct ChatView: View {
@@ -256,9 +257,15 @@ struct ChatDetailView: View {
             }
 
             // Input bar
-            MessageInputBar(messageText: $messageText) {
-                sendMessage()
-            }
+            MessageInputBar(
+                messageText: $messageText,
+                onSend: { sendMessage() },
+                onPickImage: { image in
+                    Task {
+                        _ = await chatManager.sendImageMessage(conversationId: conversationId, image: image)
+                    }
+                }
+            )
         }
         .navigationTitle(conversation.otherUser?.name ?? "Chat")
         .navigationBarTitleDisplayMode(.inline)
@@ -279,9 +286,11 @@ struct ChatDetailView: View {
         .onAppear {
             guard !conversationId.isEmpty else { return }
             chatManager.startListeningToMessages(conversationId: conversationId)
+            Task { await chatManager.markConversationAsRead(conversationId: conversationId) }
         }
         .onDisappear {
             chatManager.stopListeningToMessages()
+            Task { await chatManager.markConversationAsRead(conversationId: conversationId) }
         }
     }
 
@@ -310,17 +319,36 @@ struct MessageBubbleView: View {
             if isFromCurrentUser { Spacer(minLength: 60) }
 
             VStack(alignment: isFromCurrentUser ? .trailing : .leading, spacing: 3) {
-                Text(message.content)
-                    .font(.body)
-                    .foregroundColor(isFromCurrentUser ? .white : .primary)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 18)
-                            .fill(isFromCurrentUser
-                                  ? AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing))
-                                  : AnyShapeStyle(Color(UIColor.systemGray5)))
-                    )
+                if message.type == .image, let url = URL(string: message.content) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let img):
+                            img.resizable().scaledToFill()
+                        case .failure:
+                            Image(systemName: "photo")
+                                .font(.largeTitle)
+                                .foregroundColor(.gray)
+                                .frame(width: 220, height: 220)
+                        default:
+                            ProgressView()
+                                .frame(width: 220, height: 220)
+                        }
+                    }
+                    .frame(maxWidth: 240, maxHeight: 320)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                } else {
+                    Text(message.content)
+                        .font(.body)
+                        .foregroundColor(isFromCurrentUser ? .white : .primary)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .fill(isFromCurrentUser
+                                      ? AnyShapeStyle(LinearGradient(colors: [.blue, .purple], startPoint: .leading, endPoint: .trailing))
+                                      : AnyShapeStyle(Color(UIColor.systemGray5)))
+                        )
+                }
 
                 Text(message.timestamp, style: .time)
                     .font(.caption2)
@@ -337,12 +365,37 @@ struct MessageBubbleView: View {
 struct MessageInputBar: View {
     @Binding var messageText: String
     let onSend: () -> Void
+    var onPickImage: ((UIImage) -> Void)? = nil
     @FocusState private var isFocused: Bool
+    @State private var photoItem: PhotosPickerItem? = nil
+    @State private var isUploadingImage = false
 
     var isEmpty: Bool { messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
 
     var body: some View {
         HStack(spacing: 10) {
+            if let onPickImage = onPickImage {
+                PhotosPicker(selection: $photoItem, matching: .images) {
+                    Image(systemName: isUploadingImage ? "circle.dotted" : "photo.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(isUploadingImage ? .secondary : .blue)
+                }
+                .disabled(isUploadingImage)
+                .onChange(of: photoItem) { item in
+                    Task {
+                        guard let item = item,
+                              let data = try? await item.loadTransferable(type: Data.self),
+                              let img = UIImage(data: data) else { return }
+                        await MainActor.run { isUploadingImage = true }
+                        onPickImage(img)
+                        await MainActor.run {
+                            photoItem = nil
+                            isUploadingImage = false
+                        }
+                    }
+                }
+            }
+
             TextField("Escribe un mensaje...", text: $messageText, axis: .vertical)
                 .lineLimit(1...5)
                 .padding(.horizontal, 14)

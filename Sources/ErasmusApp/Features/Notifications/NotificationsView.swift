@@ -29,7 +29,38 @@ struct NotificationsView: View {
 
     var body: some View {
         NavigationView {
-            Group {
+            VStack(spacing: 0) {
+                NavigationLink(destination: FriendRequestsView()) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.badge.plus")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 40, height: 40)
+                            .background(
+                                LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+                            )
+                            .clipShape(Circle())
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Solicitudes de amistad")
+                                .font(.subheadline).fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                            let count = socialManager.friendRequests.filter { $0.status == .pending }.count
+                            Text(count == 0 ? "Ninguna pendiente" : "\(count) pendiente\(count == 1 ? "" : "s")")
+                                .font(.caption).foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption).foregroundColor(.secondary)
+                    }
+                    .padding(14)
+                    .background(Color(UIColor.secondarySystemBackground))
+                    .cornerRadius(14)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                }
+                .buttonStyle(PlainButtonStyle())
+
+                Group {
                 if manager.notifications.isEmpty {
                     VStack(spacing: 16) {
                         Image(systemName: "bell.slash")
@@ -76,7 +107,8 @@ struct NotificationsView: View {
                     }
                     .listStyle(.plain)
                 }
-            }
+                } // Group
+            } // VStack
             .navigationTitle("Notificaciones")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

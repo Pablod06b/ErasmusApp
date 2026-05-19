@@ -25,16 +25,18 @@ struct Conversation: Identifiable, Codable {
     var lastMessage: String
     var lastMessageTime: Date
     var unreadCount: Int = 0
+    /// Timestamp por usuario de la última vez que abrió la conversación.
+    /// Si lastReadAt[otherUserId] >= lastMessageTime del último mensaje mío, está leído.
+    var lastReadAt: [String: Date]? = nil
     var otherUser: ChatUser? // Local helper, not stored in Firestore usually, but we might denormalize for simplicity or fetch separately
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case participants
         case lastMessage
         case lastMessageTime
-        // unreadCount is excluded from CodingKeys if we don't store it, OR we include it.
-        // If we want to store it:
         case unreadCount
+        case lastReadAt
     }
 }
 

@@ -27,6 +27,8 @@ struct UserProfile: Codable, Identifiable {
     var groupCode: String?
     var groupType: String?
     var permissions: UserPermissions
+    // Mes/año de inicio del Erasmus (formato "MMM yyyy", p.ej. "Sept 2026"). Opcional para compat.
+    var erasmusStartDate: String?
 
     // Social graph
     var followerIds: [String]
@@ -51,7 +53,7 @@ struct UserProfile: Codable, Identifiable {
     // Account type
     var accountType: AccountType
 
-    init(id: String, email: String, displayName: String, username: String, createdAt: Date, lastLogin: Date, interests: [String], destination: String, photoURL: String, bio: String = "", onboardingCompleted: Bool, university: String = "", career: String = "", erasmusStatus: String = "", languages: [LanguageLevel] = [], groupCode: String? = nil, groupType: String? = nil, permissions: UserPermissions = UserPermissions(), postsCount: Int = 0, eventsCount: Int = 0, connectionsCount: Int = 0, followerIds: [String] = [], followingIds: [String] = [], friendIds: [String] = [], pendingFriendRequestIds: [String] = [], savedPostIds: [String] = [], savedEventIds: [String] = [], savedCityNames: [String] = [], savedUserIds: [String] = [], blockedUserIds: [String]? = nil, originCountry: String = "España", originCity: String = "", accountType: AccountType = .student) {
+    init(id: String, email: String, displayName: String, username: String, createdAt: Date, lastLogin: Date, interests: [String], destination: String, photoURL: String, bio: String = "", onboardingCompleted: Bool, university: String = "", career: String = "", erasmusStatus: String = "", languages: [LanguageLevel] = [], groupCode: String? = nil, groupType: String? = nil, permissions: UserPermissions = UserPermissions(), erasmusStartDate: String? = nil, postsCount: Int = 0, eventsCount: Int = 0, connectionsCount: Int = 0, followerIds: [String] = [], followingIds: [String] = [], friendIds: [String] = [], pendingFriendRequestIds: [String] = [], savedPostIds: [String] = [], savedEventIds: [String] = [], savedCityNames: [String] = [], savedUserIds: [String] = [], blockedUserIds: [String]? = nil, originCountry: String = "España", originCity: String = "", accountType: AccountType = .student) {
         self.id = id
         self.email = email
         self.displayName = displayName
@@ -70,6 +72,7 @@ struct UserProfile: Codable, Identifiable {
         self.groupCode = groupCode
         self.groupType = groupType
         self.permissions = permissions
+        self.erasmusStartDate = erasmusStartDate
         self.postsCount = postsCount
         self.eventsCount = eventsCount
         self.connectionsCount = connectionsCount
@@ -87,6 +90,13 @@ struct UserProfile: Codable, Identifiable {
         self.accountType = accountType
     }
     
+    private func formattedStartDate(from date: Date) -> String {
+        let fmt = DateFormatter()
+        fmt.locale = Locale(identifier: "es_ES")
+        fmt.dateFormat = "MMM yyyy"
+        return fmt.string(from: date).capitalized
+    }
+
     // Helper to convert to ExtendedUserProfile (for UI compatibility)
     func toExtendedUserProfile() -> ExtendedUserProfile {
         return ExtendedUserProfile(
@@ -97,15 +107,16 @@ struct UserProfile: Codable, Identifiable {
             university: university,
             career: career,
             currentDestination: destination,
-            erasmusStartDate: "Sept 2025", // Placeholder or derived from createdAt
+            erasmusStartDate: erasmusStartDate ?? formattedStartDate(from: createdAt),
             languages: languages.map { "\($0.language) (\($0.level))" },
             interests: interests,
             isVerified: false,
             postsCount: postsCount,
             eventsCount: eventsCount,
             connectionsCount: connectionsCount,
-            userPosts: [], // TODO: Load real posts
-            userEvents: [], // TODO: Load real events
+            // userPosts/userEvents se cargan en UserProfileView via postManager.fetchUserPosts
+            userPosts: [],
+            userEvents: [],
             photoURL: photoURL,
             friendIds: friendIds,
             followerIds: followerIds
@@ -145,6 +156,9 @@ struct UserPermissions: Codable {
     var isPrivateAccount: Bool = false
     var showOnlineStatus: Bool = true
     var allowNotifications: Bool = true
+    // Notifications granularity (opcional para compatibilidad)
+    var allowMessageNotifications: Bool? = true
+    var allowEventNotifications: Bool? = true
 }
 
 // MARK: - Extended User Profile Model

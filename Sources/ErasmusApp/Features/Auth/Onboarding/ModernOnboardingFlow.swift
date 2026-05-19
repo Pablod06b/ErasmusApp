@@ -29,6 +29,7 @@ struct ModernOnboardingFlow: View {
     // Destino
     @State private var destinoBusqueda: String = ""
     @State private var destinoSeleccionado: String = ""
+    @State private var fechaInicioErasmus: Date = Date()
     
     // Idiomas e intereses
     @State private var idiomaEntrada: String = ""
@@ -185,15 +186,28 @@ struct ModernOnboardingFlow: View {
     // MARK: - Bottom Section
     private var bottomSection: some View {
         VStack(spacing: 16) {
-            if currentStep != .registro1 && currentStep != .completado {
-                Button(action: goBack) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .medium))
-                        Text("Atrás")
-                            .font(.system(size: 16, weight: .medium))
+            HStack {
+                if currentStep != .registro1 && currentStep != .completado {
+                    Button(action: goBack) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 16, weight: .medium))
+                            Text("Atrás")
+                                .font(.system(size: 16, weight: .medium))
+                        }
+                        .foregroundColor(.blue)
                     }
-                    .foregroundColor(.blue)
+                }
+
+                Spacer()
+
+                if isOptionalStep(currentStep) {
+                    Button(action: skipCurrent) {
+                        Text("Saltar")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .underline()
+                    }
                 }
             }
             
@@ -399,7 +413,7 @@ struct ModernOnboardingFlow: View {
                 Text("Ciudades populares")
                     .font(.headline)
                     .foregroundColor(.primary)
-                
+
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
                     ForEach(["Salamanca", "Madrid", "Barcelona", "Valencia", "Sevilla", "Granada"], id: \.self) { city in
                         ModernCityCard(
@@ -413,6 +427,23 @@ struct ModernOnboardingFlow: View {
                     }
                 }
             }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("¿Cuándo empieza tu Erasmus?")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                DatePicker(
+                    "Fecha de inicio",
+                    selection: $fechaInicioErasmus,
+                    displayedComponents: [.date]
+                )
+                .datePickerStyle(.compact)
+                .labelsHidden()
+                Text("Solo lo usaremos para mostrarlo en tu perfil.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, 8)
         }
     }
     
@@ -729,6 +760,23 @@ struct ModernOnboardingFlow: View {
         }
     }
     
+    /// Pasos que el usuario puede saltar (foto, idiomas, grupos)
+    private func isOptionalStep(_ step: OnboardingStep) -> Bool {
+        switch step {
+        case .fotoPerfil, .idiomas, .grupos:
+            return true
+        default:
+            return false
+        }
+    }
+
+    /// Avanza al siguiente paso sin validar el actual
+    private func skipCurrent() {
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            currentStep = currentStep.next
+        }
+    }
+
     private func goNext() {
         guard canContinue else { return }
         
@@ -791,6 +839,13 @@ struct ModernOnboardingFlow: View {
                     groupType: opcionGrupo?.rawValue,
                     permissions: permissions
                 )
+
+                // Guardar fecha de inicio Erasmus en Firestore (formato ES: "Sept 2026")
+                let fmt = DateFormatter()
+                fmt.locale = Locale(identifier: "es_ES")
+                fmt.dateFormat = "MMM yyyy"
+                let formattedStart = fmt.string(from: fechaInicioErasmus).capitalized
+                try? await authManager.updateUserProfile(data: ["erasmusStartDate": formattedStart])
                 
                 // Upload profile image safely to Firebase Storage
                 #if canImport(UIKit)

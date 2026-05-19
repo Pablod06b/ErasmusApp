@@ -19,7 +19,11 @@ class NotificationManager: ObservableObject {
     }
     
     private init() {}
-    
+
+    deinit {
+        listener?.remove()
+    }
+
     func startListening() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
