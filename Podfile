@@ -10,7 +10,7 @@ target 'Erasmus_App' do
   pod 'Firebase/Analytics'
   pod 'Firebase/Core'
   pod 'Firebase/Messaging'
-  pod 'Firebase/Crashlytics'
+  # pod 'Firebase/Crashlytics'  # Descomenta y ejecuta `pod install` para activar crash reporting
   
   # Google
   pod 'GoogleSignIn', '~> 7.1.0'
