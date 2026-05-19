@@ -12,8 +12,8 @@ struct DeleteAccountView: View {
     @State private var isProcessing = false
     @State private var errorMessage: String? = nil
 
-    // URL del Cloud Function deleteUserData (region us-central1 por defecto)
-    private let deleteUserDataURL = URL(string: "https://us-central1-erasmusconnect-2a003.cloudfunctions.net/deleteUserData")!
+    // URL del Cloud Function deleteUserData (2nd Gen — Cloud Run)
+    private let deleteUserDataURL = URL(string: "https://deleteuserdata-7wqffoff5q-uc.a.run.app")!
 
     var canSubmit: Bool {
         !isProcessing &&

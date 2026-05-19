@@ -2,7 +2,7 @@ const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onRequest } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
-const { getFirestore } = require("firebase-admin/firestore");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getStorage } = require("firebase-admin/storage");
 const { getMessaging } = require("firebase-admin/messaging");
 const logger = require("firebase-functions/logger");
@@ -110,7 +110,7 @@ exports.onReportCreated = onDocumentCreated(
     // Mantener contador agregado en moderationStats/global para vista admin futura
     await db.doc("moderationStats/global").set(
       {
-        totalReports: require("firebase-admin/firestore").FieldValue.increment(1),
+        totalReports: FieldValue.increment(1),
         lastReportAt: new Date(),
       },
       { merge: true }
@@ -122,7 +122,7 @@ exports.onReportCreated = onDocumentCreated(
 // HTTP endpoint que requiere Authorization: Bearer <idToken>
 // Llamado por DeleteAccountView. Borra perfil, posts, eventos, conversaciones,
 // notificaciones, friend requests, favoritos, y fotos en Storage.
-exports.deleteUserData = onRequest({ cors: true }, async (req, res) => {
+exports.deleteUserData = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).send({ error: "Method not allowed" });
   }

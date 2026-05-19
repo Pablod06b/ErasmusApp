@@ -14,19 +14,19 @@ service firebase.storage {
       return request.resource.size < mb * 1024 * 1024;
     }
 
-    // Profile images: ruta contiene userId, solo el dueño puede escribir
-    match /profile_images/{userId}.jpg {
+    // Profile images: el filename empieza por el uid (formato {uid}.jpg)
+    match /profile_images/{fileName} {
       allow read: if isSignedIn();
       allow write: if isSignedIn()
-        && request.auth.uid == userId
+        && fileName.matches(request.auth.uid + '\\.jpg')
         && isImage()
         && maxSize(5);
     }
 
-    // Posts: el path es posts/{postId}.jpg — el postId es UUID generado por la app.
+    // Posts: el path es posts/{filename} — el filename es UUID generado por la app.
     // Cualquier autenticado puede subir su propia imagen de post.
-    // TODO futuro: migrar a posts/{userId}/{postId}.jpg para verificar autoría.
-    match /posts/{postId} {
+    // TODO futuro: migrar a posts/{userId}/{filename} para verificar autoría.
+    match /posts/{fileName} {
       allow read: if isSignedIn();
       allow write: if isSignedIn() && isImage() && maxSize(10);
     }
