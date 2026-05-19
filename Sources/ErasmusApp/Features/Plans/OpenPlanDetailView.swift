@@ -126,14 +126,8 @@ struct OpenPlanDetailView: View {
             HStack {
                 HStack(spacing: -8) {
                     ForEach(participants.prefix(5)) { participant in
-                        AsyncImage(url: URL(string: participant.userPhotoURL ?? "https://picsum.photos/40/40?random=\(participant.userId.prefix(6))")) { img in
-                            img.resizable().scaledToFill()
-                        } placeholder: {
-                            Circle().fill(Color.gray.opacity(0.3))
-                        }
-                        .frame(width: 32, height: 32)
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color(UIColor.systemBackground), lineWidth: 2))
+                        UserAvatarView(photoURL: participant.userPhotoURL, name: participant.userName, size: 32)
+                            .overlay(Circle().stroke(Color(UIColor.systemBackground), lineWidth: 2))
                     }
                 }
 
@@ -189,13 +183,7 @@ struct OpenPlanDetailView: View {
                 LazyVStack(spacing: 10) {
                     ForEach(participants) { participant in
                         HStack(spacing: 12) {
-                            AsyncImage(url: URL(string: participant.userPhotoURL ?? "https://picsum.photos/40/40?random=\(participant.userId.prefix(6))")) { img in
-                                img.resizable().scaledToFill()
-                            } placeholder: {
-                                Circle().fill(Color.gray.opacity(0.2))
-                            }
-                            .frame(width: 40, height: 40)
-                            .clipShape(Circle())
+                            UserAvatarView(photoURL: participant.userPhotoURL, name: participant.userName, size: 40)
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(participant.userName)

@@ -33,6 +33,7 @@ class ChatManager: ObservableObject {
                     guard let self else { return }
                     if let error = error {
                         print("Conversations listener error: \(error.localizedDescription)")
+                        AppErrorManager.shared.report("No se pudieron cargar tus mensajes.", icon: "message.badge.fill")
                         self.isLoadingConversations = false
                         return
                     }
@@ -53,7 +54,13 @@ class ChatManager: ObservableObject {
     }
 
     private func enrichConversations(_ convs: [Conversation], currentUserId: String) async {
-        var enriched = convs
+        let blocked = await MainActor.run { SocialManager.shared.blockedUserIds }
+        // Filtra conversaciones con usuarios bloqueados
+        let visible = convs.filter { conv in
+            guard let other = conv.participants.first(where: { $0 != currentUserId }) else { return true }
+            return !blocked.contains(other)
+        }
+        var enriched = visible
         for i in 0..<enriched.count {
             guard let otherUserId = enriched[i].participants.first(where: { $0 != currentUserId }) else { continue }
             if let user = await fetchChatUser(userId: otherUserId) {
@@ -249,6 +256,7 @@ class ChatManager: ObservableObject {
             return true
         } catch {
             print("Error sending message: \(error.localizedDescription)")
+            AppErrorManager.shared.report("No se pudo enviar el mensaje. Inténtalo de nuevo.", icon: "exclamationmark.bubble.fill")
             return false
         }
     }
@@ -272,6 +280,7 @@ class ChatManager: ObservableObject {
                 .addDocument(data: messageData)
         } catch {
             print("Error sending group message: \(error.localizedDescription)")
+            AppErrorManager.shared.report("No se pudo enviar el mensaje al grupo.", icon: "exclamationmark.bubble.fill")
         }
     }
 

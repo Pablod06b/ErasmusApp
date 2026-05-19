@@ -57,7 +57,17 @@ struct SettingsView: View {
                     .onChange(of: showOnlineStatus) { value in
                         Task { try? await authManager.updateUserProfile(data: ["permissions.showOnlineStatus": value]) }
                     }
-                    SettingsRowView(icon: "eye.slash.fill", title: "Usuarios bloqueados", iconColor: .red) {}
+                    NavigationLink(destination: BlockedUsersView()) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "eye.slash.fill")
+                                .foregroundColor(.red)
+                                .frame(width: 24)
+                                .font(.system(size: 18))
+                            Text("Usuarios bloqueados")
+                                .foregroundColor(.primary)
+                            Spacer()
+                        }
+                    }
                 }
 
                 // Section 3: Notifications
@@ -79,17 +89,17 @@ struct SettingsView: View {
                 
                 // Section 4: Support
                 Section(header: Text("Soporte e Información").font(.subheadline).foregroundColor(.gray)) {
-                    SettingsRowView(icon: "questionmark.circle.fill", title: "Centro de ayuda", iconColor: .purple) {
-                        showMaintenanceAlert = true
+                    NavigationLink(destination: HelpCenterView()) {
+                        settingsRow(icon: "questionmark.circle.fill", title: "Centro de ayuda", color: .purple)
                     }
-                    SettingsRowView(icon: "exclamationmark.bubble.fill", title: "Reportar un problema", iconColor: .purple) {
-                        showMaintenanceAlert = true
+                    NavigationLink(destination: BugReportView()) {
+                        settingsRow(icon: "exclamationmark.bubble.fill", title: "Reportar un problema", color: .purple)
                     }
-                    SettingsRowView(icon: "doc.text.fill", title: "Términos y condiciones", iconColor: .purple) {
-                        showMaintenanceAlert = true
+                    NavigationLink(destination: TermsView()) {
+                        settingsRow(icon: "doc.text.fill", title: "Términos y condiciones", color: .purple)
                     }
-                    SettingsRowView(icon: "hand.raised.circle.fill", title: "Política de privacidad", iconColor: .purple) {
-                        showMaintenanceAlert = true
+                    NavigationLink(destination: PrivacyPolicyView()) {
+                        settingsRow(icon: "hand.raised.circle.fill", title: "Política de privacidad", color: .purple)
                     }
                 }
                 
@@ -187,6 +197,19 @@ struct SettingsView: View {
         .sheet(isPresented: $showEditProfile) {
             EditProfileView(user: authManager.currentUser?.toExtendedUserProfile() ?? ExtendedUserProfile.sampleUser)
                 .environmentObject(authManager)
+        }
+    }
+
+    /// Fila visual para usar dentro de un NavigationLink (sin botón propio)
+    private func settingsRow(icon: String, title: String, color: Color) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .foregroundColor(color)
+                .frame(width: 24)
+                .font(.system(size: 18))
+            Text(title)
+                .foregroundColor(.primary)
+            Spacer()
         }
     }
 

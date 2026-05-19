@@ -238,6 +238,8 @@ class FirebaseAuthManager: ObservableObject {
             if document.exists {
                 self.currentUser = try document.data(as: UserProfile.self)
                 self.isAuthenticated = true
+                // Sincroniza set de bloqueados para filtros instantáneos
+                await SocialManager.shared.loadBlockedUsers()
             } else {
                 // User exists in Auth but not in Firestore (rare edge case)
                 self.isAuthenticated = false

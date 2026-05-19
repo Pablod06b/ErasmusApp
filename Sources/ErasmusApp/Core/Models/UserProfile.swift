@@ -40,6 +40,9 @@ struct UserProfile: Codable, Identifiable {
     var savedCityNames: [String]
     var savedUserIds: [String]
 
+    // Blocked users (no ven mis posts ni pueden enviarme mensajes)
+    var blockedUserIds: [String]
+
     // Origin country/city
     var originCountry: String
     var originCity: String
@@ -47,7 +50,7 @@ struct UserProfile: Codable, Identifiable {
     // Account type
     var accountType: AccountType
 
-    init(id: String, email: String, displayName: String, username: String, createdAt: Date, lastLogin: Date, interests: [String], destination: String, photoURL: String, bio: String = "", onboardingCompleted: Bool, university: String = "", career: String = "", erasmusStatus: String = "", languages: [LanguageLevel] = [], groupCode: String? = nil, groupType: String? = nil, permissions: UserPermissions = UserPermissions(), postsCount: Int = 0, eventsCount: Int = 0, connectionsCount: Int = 0, followerIds: [String] = [], followingIds: [String] = [], friendIds: [String] = [], pendingFriendRequestIds: [String] = [], savedPostIds: [String] = [], savedEventIds: [String] = [], savedCityNames: [String] = [], savedUserIds: [String] = [], originCountry: String = "España", originCity: String = "", accountType: AccountType = .student) {
+    init(id: String, email: String, displayName: String, username: String, createdAt: Date, lastLogin: Date, interests: [String], destination: String, photoURL: String, bio: String = "", onboardingCompleted: Bool, university: String = "", career: String = "", erasmusStatus: String = "", languages: [LanguageLevel] = [], groupCode: String? = nil, groupType: String? = nil, permissions: UserPermissions = UserPermissions(), postsCount: Int = 0, eventsCount: Int = 0, connectionsCount: Int = 0, followerIds: [String] = [], followingIds: [String] = [], friendIds: [String] = [], pendingFriendRequestIds: [String] = [], savedPostIds: [String] = [], savedEventIds: [String] = [], savedCityNames: [String] = [], savedUserIds: [String] = [], blockedUserIds: [String] = [], originCountry: String = "España", originCity: String = "", accountType: AccountType = .student) {
         self.id = id
         self.email = email
         self.displayName = displayName
@@ -77,6 +80,7 @@ struct UserProfile: Codable, Identifiable {
         self.savedEventIds = savedEventIds
         self.savedCityNames = savedCityNames
         self.savedUserIds = savedUserIds
+        self.blockedUserIds = blockedUserIds
         self.originCountry = originCountry
         self.originCity = originCity
         self.accountType = accountType

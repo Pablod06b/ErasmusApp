@@ -259,10 +259,18 @@ struct ExploreView: View {
 
             SectionHeaderExplore(title: "Eventos destacados", icon: "sparkles", color: .purple)
 
-            // Sample events for demo
-            LazyVStack(spacing: 14) {
-                ForEach(sampleEventsForExplore) { event in
-                    EventCardView(evento: event)
+            // Real events from Firestore
+            if EventManager.shared.events.isEmpty {
+                exploreEmptyState(
+                    icon: "calendar.badge.exclamationmark",
+                    title: "Aún no hay eventos",
+                    message: "Sé el primero en crear un evento en tu ciudad."
+                )
+            } else {
+                LazyVStack(spacing: 14) {
+                    ForEach(EventManager.shared.events) { event in
+                        EventCardView(evento: event)
+                    }
                 }
             }
         }
@@ -278,12 +286,29 @@ struct ExploreView: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
 
-            LazyVStack(spacing: 14) {
-                ForEach(sampleHousingListings) { listing in
-                    HousingCardView(listing: listing)
-                }
-            }
+            // TODO: cargar HousingListings reales de Firestore cuando exista el modelo en backend
+            exploreEmptyState(
+                icon: "house",
+                title: "Próximamente",
+                message: "Estamos preparando el listado de pisos reales. Mientras tanto, busca en el feed de Inicio filtrando por Casas."
+            )
         }
+    }
+
+    private func exploreEmptyState(icon: String, title: String, message: String) -> some View {
+        VStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 44))
+                .foregroundColor(.gray.opacity(0.5))
+            Text(title).font(.headline)
+            Text(message)
+                .font(.subheadline).foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+        .background(Color(UIColor.secondarySystemBackground))
+        .cornerRadius(14)
     }
 
     // MARK: - Data Loaders
@@ -305,46 +330,6 @@ struct ExploreView: View {
         isLoadingUsers = false
     }
 
-    // MARK: - Sample Data
-
-    var sampleEventsForExplore: [Evento] {
-        let all = EventManager.shared.events
-        if all.isEmpty {
-            return [
-                Evento(title: "Erasmus Welcome Party", location: "Club Fabric", date: "Viernes 20:00", imageName: "party", participants: 120, category: "Fiesta"),
-                Evento(title: "Free Walking Tour", location: "Centro histórico", date: "Sábado 10:00", imageName: "Roma", participants: 25, category: "Cultural"),
-                Evento(title: "Torneo Beer Pong Erasmus", location: "Hostel One", date: "Jueves 22:00", imageName: "beerpong", participants: 60, category: "Fiesta", price: 5.0)
-            ]
-        }
-        return all
-    }
-
-    var sampleHousingListings: [HousingListing] {
-        [
-            HousingListing(
-                userId: "u1", ownerName: "Carlos M.", ownerPhotoURL: nil,
-                city: "Roma", title: "Habitación en piso compartido – Trastevere",
-                description: "Piso de 4 hab cerca del Tiber. Cocina equipada, WiFi, ideal para Erasmus.",
-                price: 550, roomsAvailable: 1, totalRooms: 4,
-                amenities: ["WiFi", "Cocina", "Lavadora", "Balcón"],
-                photoURLs: [], address: "Trastevere, Roma",
-                availableFrom: Date(), contactInfo: "carlos@erasmus.com",
-                flatmateInterests: ["Fiesta", "Cultura"], flatmateSchedule: "Flexible",
-                createdAt: Date()
-            ),
-            HousingListing(
-                userId: "u2", ownerName: "Ana G.", ownerPhotoURL: nil,
-                city: "Salamanca", title: "Estudio en el centro histórico",
-                description: "Estudio completo para una persona, amueblado. 2 min andando a la Universidad.",
-                price: 420, roomsAvailable: 1, totalRooms: 1,
-                amenities: ["WiFi", "Todo incluido", "A/C"],
-                photoURLs: [], address: "Calle Mayor, Salamanca",
-                availableFrom: Date(), contactInfo: "ana@uni.es",
-                flatmateInterests: [], flatmateSchedule: "Normal",
-                createdAt: Date()
-            )
-        ]
-    }
 }
 
 // MARK: - City Card View

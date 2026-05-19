@@ -491,13 +491,7 @@ struct CommentRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            AsyncImage(url: URL(string: "https://picsum.photos/40/40?random=\(comment.userId.prefix(4))")) { img in
-                img.resizable().scaledToFill()
-            } placeholder: {
-                Circle().fill(Color.gray.opacity(0.2))
-            }
-            .frame(width: 36, height: 36)
-            .clipShape(Circle())
+            UserAvatarView(photoURL: nil, name: comment.userName, size: 36)
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack {

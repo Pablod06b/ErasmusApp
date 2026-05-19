@@ -1,18 +1,24 @@
 import Foundation
 import FirebaseCore
+import FirebaseFirestore
 
 // MARK: - Firebase Configuration
 struct FirebaseConfig {
-    
+
     // MARK: - Configuration
     static func configure() {
         // Check if Firebase is already configured
         guard FirebaseApp.app() == nil else { return }
-        
+
         // Configure Firebase
         FirebaseApp.configure()
-        
-        print("🔥 Firebase configurado exitosamente")
+
+        // Habilitar persistencia offline de Firestore (la app funciona sin red)
+        let settings = FirestoreSettings()
+        settings.cacheSettings = PersistentCacheSettings(sizeBytes: NSNumber(value: 100 * 1024 * 1024)) // 100 MB
+        Firestore.firestore().settings = settings
+
+        print("🔥 Firebase configurado con persistencia offline (cache 100 MB)")
     }
     
     // MARK: - Project Configuration

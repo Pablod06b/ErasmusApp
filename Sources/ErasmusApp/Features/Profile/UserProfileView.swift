@@ -111,27 +111,9 @@ struct UserProfileView: View {
                             // User Info inside the glass overlay
                             VStack(alignment: .center, spacing: 8) {
                                 // Floating Avatar
-                                Group {
-                                    if let photoURL = user.photoURL, !photoURL.isEmpty, let url = URL(string: photoURL) {
-                                        AsyncImage(url: url) { image in
-                                            image.resizable().scaledToFill()
-                                        } placeholder: {
-                                            Circle().fill(Color.gray.opacity(0.3))
-                                        }
-                                    } else {
-                                        AsyncImage(url: URL(string: "https://picsum.photos/300/300?random=\(user.id)")) { image in
-                                            image.resizable().scaledToFill()
-                                        } placeholder: {
-                                            Circle()
-                                                .fill(Color.white.opacity(0.2))
-                                                .overlay(Image(systemName: "person.fill").font(.system(size: 40)).foregroundColor(.white))
-                                        }
-                                    }
-                                }
-                                .frame(width: 110, height: 110)
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 3))
-                                .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                                UserAvatarView(photoURL: user.photoURL, name: user.name, size: 110)
+                                    .overlay(Circle().stroke(Color.white.opacity(0.4), lineWidth: 3))
+                                    .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
                                 
                                 // Name & Basic Info
                                 HStack {
@@ -283,7 +265,15 @@ struct UserProfileView: View {
                     }
                 } else {
                     Button(role: .destructive, action: { showReportAlert = true }) {
-                        Label("Reportar o Bloquear", systemImage: "exclamationmark.shield")
+                        Label("Reportar", systemImage: "flag.fill")
+                    }
+                    Button(role: .destructive, action: {
+                        Task {
+                            try? await socialManager.block(userId: user.id)
+                            dismiss()
+                        }
+                    }) {
+                        Label(socialManager.isBlocked(userId: user.id) ? "Desbloquear" : "Bloquear", systemImage: "hand.raised.fill")
                     }
                 }
             } label: {

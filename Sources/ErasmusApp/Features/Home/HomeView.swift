@@ -81,6 +81,7 @@ struct HomeView: View {
     @StateObject private var userManager = UserManager.shared
     @StateObject private var notificationManager = NotificationManager.shared
     @StateObject private var router = NavigationRouter.shared
+    @StateObject private var errorManager = AppErrorManager.shared
 
     @State private var selectedSort: FeedSortMode = .recientes
     @State private var showCreatePostSheet = false
@@ -165,14 +166,21 @@ struct HomeView: View {
                 router.pendingTarget = nil
             }
             .overlay(alignment: .top) {
-                if let toast = notificationManager.currentToast {
-                    NotificationToastView(notification: toast)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                        .padding(.top, 60)
-                        .zIndex(100)
+                VStack(spacing: 8) {
+                    if let appError = errorManager.currentError {
+                        AppErrorBannerView(error: appError) { errorManager.dismiss() }
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    if let toast = notificationManager.currentToast {
+                        NotificationToastView(notification: toast)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
                 }
+                .padding(.top, 60)
+                .zIndex(100)
             }
             .animation(.spring(), value: notificationManager.currentToast)
+            .animation(.spring(), value: errorManager.currentError)
         }
     }
 
@@ -703,7 +711,7 @@ struct FeedEventCard: View {
     }
 
     var body: some View {
-        NavigationLink(destination: EventDetailPlaceholder(evento: evento)) {
+        NavigationLink(destination: EventDetailView(evento: evento)) {
             VStack(alignment: .leading, spacing: 0) {
                 // Banner
                 ZStack(alignment: .topTrailing) {
@@ -785,26 +793,6 @@ struct FeedEventCard: View {
                 .font(.system(size: 48, weight: .ultraLight))
                 .foregroundColor(.white.opacity(0.5))
         )
-    }
-}
-
-// Placeholder event detail until a real one exists
-private struct EventDetailPlaceholder: View {
-    let evento: Evento
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(evento.title).font(.largeTitle).fontWeight(.bold).padding(.horizontal)
-                Label(evento.location, systemImage: "mappin.circle.fill").padding(.horizontal)
-                Label(evento.date, systemImage: "calendar").padding(.horizontal)
-                if let desc = evento.eventDescription {
-                    Text(desc).padding(.horizontal)
-                }
-            }
-            .padding(.top, 20)
-        }
-        .navigationTitle("Evento")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

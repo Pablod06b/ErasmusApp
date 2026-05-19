@@ -114,16 +114,23 @@ class PostManager: ObservableObject {
                 try doc.data(as: ErasmusPost.self)
             }
 
+            // Filtrar posts de usuarios bloqueados
+            let blocked = await MainActor.run { SocialManager.shared.blockedUserIds }
+            let visible = fetchedPosts.filter { !blocked.contains($0.userId) }
+
             // Update cursor
             self.lastDocument = snapshot.documents.last
 
             DispatchQueue.main.async {
-                self.posts.append(contentsOf: fetchedPosts)
+                self.posts.append(contentsOf: visible)
                 self.isLoading = false
             }
         } catch {
             print("Error fetching posts: \(error)")
-            DispatchQueue.main.async { self.isLoading = false }
+            await MainActor.run {
+                AppErrorManager.shared.report("No se pudo cargar el feed. Revisa tu conexión.", icon: "wifi.exclamationmark")
+                self.isLoading = false
+            }
         }
     }
 

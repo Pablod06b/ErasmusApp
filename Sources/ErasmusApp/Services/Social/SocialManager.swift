@@ -10,11 +10,90 @@ class SocialManager: ObservableObject {
     @Published var friendRequests: [FriendRequest] = []
     @Published var pendingRequestCount: Int = 0
     @Published var isLoading: Bool = false
+    @Published var blockedUserIds: Set<String> = []
 
     private let db = Firestore.firestore()
     private var requestsListener: ListenerRegistration?
 
     private init() {}
+
+    // MARK: - Block / Unblock
+
+    /// Bloquea un usuario: deja de seguirlo en ambas direcciones, lo añade a mi lista de bloqueados.
+    func block(userId targetId: String) async throws {
+        guard let myId = Auth.auth().currentUser?.uid, myId != targetId else { return }
+        let batch = db.batch()
+        let myRef = db.collection("users").document(myId)
+        let theirRef = db.collection("users").document(targetId)
+        batch.updateData([
+            "blockedUserIds": FieldValue.arrayUnion([targetId]),
+            "followingIds": FieldValue.arrayRemove([targetId]),
+            "followerIds": FieldValue.arrayRemove([targetId]),
+            "friendIds": FieldValue.arrayRemove([targetId])
+        ], forDocument: myRef)
+        // Quitarme también de sus listas para que no me vea
+        batch.updateData([
+            "followingIds": FieldValue.arrayRemove([myId]),
+            "followerIds": FieldValue.arrayRemove([myId]),
+            "friendIds": FieldValue.arrayRemove([myId])
+        ], forDocument: theirRef)
+        try await batch.commit()
+        blockedUserIds.insert(targetId)
+    }
+
+    func unblock(userId targetId: String) async throws {
+        guard let myId = Auth.auth().currentUser?.uid else { return }
+        try await db.collection("users").document(myId).updateData([
+            "blockedUserIds": FieldValue.arrayRemove([targetId])
+        ])
+        blockedUserIds.remove(targetId)
+    }
+
+    func isBlocked(userId targetId: String) -> Bool {
+        blockedUserIds.contains(targetId)
+    }
+
+    /// Carga los IDs bloqueados desde Firestore. Llámalo al inicio de sesión.
+    func loadBlockedUsers() async {
+        guard let myId = Auth.auth().currentUser?.uid else { return }
+        if let snap = try? await db.collection("users").document(myId).getDocument(),
+           let ids = snap.data()?["blockedUserIds"] as? [String] {
+            await MainActor.run { self.blockedUserIds = Set(ids) }
+        }
+    }
+
+    /// Carga los perfiles completos de los bloqueados (para el listado de Settings)
+    func fetchBlockedProfiles() async -> [UserProfile] {
+        guard !blockedUserIds.isEmpty else { return [] }
+        var results: [UserProfile] = []
+        for uid in blockedUserIds {
+            if let snap = try? await db.collection("users").document(uid).getDocument(),
+               let data = snap.data() {
+                if let profile = decodeProfile(data: data, id: uid) {
+                    results.append(profile)
+                }
+            }
+        }
+        return results
+    }
+
+    private func decodeProfile(data: [String: Any], id: String) -> UserProfile? {
+        guard let email = data["email"] as? String,
+              let displayName = data["displayName"] as? String else { return nil }
+        return UserProfile(
+            id: id,
+            email: email,
+            displayName: displayName,
+            username: data["username"] as? String ?? "",
+            createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
+            lastLogin: (data["lastLogin"] as? Timestamp)?.dateValue() ?? Date(),
+            interests: data["interests"] as? [String] ?? [],
+            destination: data["destination"] as? String ?? "",
+            photoURL: data["photoURL"] as? String ?? "",
+            bio: data["bio"] as? String ?? "",
+            onboardingCompleted: data["onboardingCompleted"] as? Bool ?? false
+        )
+    }
 
     // MARK: - Follow / Unfollow
 

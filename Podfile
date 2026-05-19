@@ -10,6 +10,7 @@ target 'Erasmus_App' do
   pod 'Firebase/Analytics'
   pod 'Firebase/Core'
   pod 'Firebase/Messaging'
+  pod 'Firebase/Crashlytics'
   
   # Google
   pod 'GoogleSignIn', '~> 7.1.0'

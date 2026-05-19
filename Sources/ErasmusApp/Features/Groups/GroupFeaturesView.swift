@@ -367,17 +367,7 @@ struct GroupMemberRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Group {
-                if !member.photoURL.isEmpty, let url = URL(string: member.photoURL) {
-                    AsyncImage(url: url) { img in img.resizable().scaledToFill() }
-                        placeholder: { Circle().fill(Color.gray.opacity(0.2)) }
-                } else {
-                    AsyncImage(url: URL(string: "https://picsum.photos/40/40?random=\(member.id.prefix(6))")) { img in img.resizable().scaledToFill() }
-                        placeholder: { Circle().fill(Color.gray.opacity(0.2)) }
-                }
-            }
-            .frame(width: 44, height: 44)
-            .clipShape(Circle())
+            UserAvatarView(photoURL: member.photoURL.isEmpty ? nil : member.photoURL, name: member.displayName, size: 44)
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack {
