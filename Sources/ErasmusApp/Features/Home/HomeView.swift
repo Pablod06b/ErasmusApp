@@ -421,11 +421,22 @@ struct HomeTabView: View {
                     .padding(.top, 8)
 
                 if isLoading && feedItems.isEmpty {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 80)
+                    AppLoadingView(message: "Cargando feed de \(selectedDestination)...")
+                        .padding(.top, 60)
+                } else if feedItems.isEmpty && !NetworkMonitor.shared.isConnected {
+                    AppErrorStateView(
+                        title: "Sin conexión",
+                        message: "No podemos cargar el feed sin internet. Comprueba tu conexión.",
+                        icon: "wifi.slash"
+                    ) {
+                        Task {
+                            feedItems = buildFeed()
+                            await onLoadMore()
+                        }
+                    }
+                    .padding(.top, 40)
                 } else if feedItems.isEmpty {
-                    EmptyStateView(
+                    AppEmptyView(
                         icon: "newspaper",
                         title: "Nada por aquí todavía",
                         message: "Sé el primero en publicar algo en \(selectedDestination)."

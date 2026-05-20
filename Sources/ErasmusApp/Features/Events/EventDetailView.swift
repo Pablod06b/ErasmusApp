@@ -15,6 +15,7 @@ struct EventDetailView: View {
     @State private var organizerPhoto: String? = nil
     @State private var mapPosition: MapCameraPosition = .automatic
     @State private var coordinate: CLLocationCoordinate2D? = nil
+    @State private var loadFailed: Bool = false
     @StateObject private var favoritesManager = FavoritesManager.shared
     @EnvironmentObject var authManager: FirebaseAuthManager
     @Environment(\.dismiss) private var dismiss
@@ -33,19 +34,26 @@ struct EventDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                heroSection
-                contentSection
-                mapSection
-                organizerSection
-                actionsSection
-                reportSection
+        Group {
+            if loadFailed {
+                ContentNotAvailableView(kind: .event, onBack: { dismiss() })
+                    .navigationBarBackButtonHidden(true)
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        heroSection
+                        contentSection
+                        mapSection
+                        organizerSection
+                        actionsSection
+                        reportSection
+                    }
+                }
+                .ignoresSafeArea(edges: .top)
+                .navigationBarBackButtonHidden(true)
+                .overlay(alignment: .topLeading) { topBar }
             }
         }
-        .ignoresSafeArea(edges: .top)
-        .navigationBarBackButtonHidden(true)
-        .overlay(alignment: .topLeading) { topBar }
         .task { await loadEventData() }
         .confirmationDialog("¿Reportar este evento?", isPresented: $showReportAlert, titleVisibility: .visible) {
             Button("Reportar", role: .destructive) { Task { await reportEvent() } }
@@ -272,6 +280,15 @@ struct EventDetailView: View {
 
     // MARK: - Data loading
     private func loadEventData() async {
+        // Verifica que el evento sigue existiendo en Firestore (puede haber sido borrado)
+        if let fid = evento.firestoreId {
+            let db = Firestore.firestore()
+            if let snap = try? await db.collection("events").document(fid).getDocument(), !snap.exists {
+                await MainActor.run { loadFailed = true }
+                return
+            }
+        }
+
         // Resolve organizer
         if let uid = evento.userId {
             let db = Firestore.firestore()
