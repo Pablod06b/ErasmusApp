@@ -70,6 +70,9 @@
 		AF123456000000000000000B /* FriendRequestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF123456000000000000000C /* FriendRequestsView.swift */; };
 		B012345600000000000000D /* EmailChangeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B012345600000000000000E /* EmailChangeView.swift */; };
 		B112345600000000000000F /* DeleteAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11234560000000000000010 /* DeleteAccountView.swift */; };
+		B21234560000000000000011 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B21234560000000000000012 /* AppConfig.swift */; };
+		B31234560000000000000013 /* AppAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B31234560000000000000014 /* AppAnalytics.swift */; };
+		B41234560000000000000015 /* AppStates.swift in Sources */ = {isa = PBXBuildFile; fileRef = B41234560000000000000016 /* AppStates.swift */; };
 		B5D2219365489B66E392FB23 /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1B08EC0D750C64AC52C16E /* FavoritesView.swift */; };
 		B798A4E0EECC471F1C6FDD3F /* AppleSignInHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72917690F718C843DF651197 /* AppleSignInHelper.swift */; };
 		B9682A26F7560430478D22BA /* MyGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD57CA0625B88EED47686BA /* MyGroupView.swift */; };
@@ -181,6 +184,9 @@
 		AF123456000000000000000C /* FriendRequestsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FriendRequestsView.swift; path = ../Sources/ErasmusApp/Features/Social/FriendRequestsView.swift; sourceTree = "<group>"; };
 		B012345600000000000000E /* EmailChangeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EmailChangeView.swift; path = ../Sources/ErasmusApp/Features/Profile/EmailChangeView.swift; sourceTree = "<group>"; };
 		B11234560000000000000010 /* DeleteAccountView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DeleteAccountView.swift; path = ../Sources/ErasmusApp/Features/Profile/DeleteAccountView.swift; sourceTree = "<group>"; };
+		B21234560000000000000012 /* AppConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppConfig.swift; path = ../Sources/ErasmusApp/Core/Config/AppConfig.swift; sourceTree = "<group>"; };
+		B31234560000000000000014 /* AppAnalytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppAnalytics.swift; path = ../Sources/ErasmusApp/Services/Analytics/AppAnalytics.swift; sourceTree = "<group>"; };
+		B41234560000000000000016 /* AppStates.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppStates.swift; path = ../Sources/ErasmusApp/UI/Components/AppStates.swift; sourceTree = "<group>"; };
 		C377D978A878D8D169040DA8 /* PostDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PostDetailView.swift; path = Sources/ErasmusApp/Features/Post/PostDetailView.swift; sourceTree = SOURCE_ROOT; };
 		CD3A72937D4D5C8877B74823 /* NotificationModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationModel.swift; path = Sources/ErasmusApp/Core/Models/NotificationModel.swift; sourceTree = "<group>"; };
 		D3309C48B75AFC285E3B349F /* GroupFeaturesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GroupFeaturesView.swift; path = Sources/ErasmusApp/Features/Groups/GroupFeaturesView.swift; sourceTree = SOURCE_ROOT; };
@@ -653,6 +659,9 @@
 				AF123456000000000000000C /* FriendRequestsView.swift */,
 				B012345600000000000000E /* EmailChangeView.swift */,
 				B11234560000000000000010 /* DeleteAccountView.swift */,
+				B21234560000000000000012 /* AppConfig.swift */,
+				B31234560000000000000014 /* AppAnalytics.swift */,
+				B41234560000000000000016 /* AppStates.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -932,6 +941,9 @@
 				AF123456000000000000000B /* FriendRequestsView.swift in Sources */,
 				B012345600000000000000D /* EmailChangeView.swift in Sources */,
 				B112345600000000000000F /* DeleteAccountView.swift in Sources */,
+				B21234560000000000000011 /* AppConfig.swift in Sources */,
+				B31234560000000000000013 /* AppAnalytics.swift in Sources */,
+				B41234560000000000000015 /* AppStates.swift in Sources */,
 				B9682A26F7560430478D22BA /* MyGroupView.swift in Sources */,
 				81959742023FF26D122ACBED /* GroupChatView.swift in Sources */,
 				9C92615225BAD69AF1F4764D /* SocialModels.swift in Sources */,

@@ -857,6 +857,13 @@ struct ModernOnboardingFlow: View {
                         }
                     } catch {
                         print("Error uploading profile photo: \(error)")
+                        // No es bloqueante para el onboarding; avisamos pero seguimos.
+                        await MainActor.run {
+                            AppErrorManager.shared.report(
+                                "No se pudo subir tu foto. Puedes intentarlo de nuevo desde Ajustes.",
+                                icon: "photo.fill"
+                            )
+                        }
                     }
                 }
                 #endif

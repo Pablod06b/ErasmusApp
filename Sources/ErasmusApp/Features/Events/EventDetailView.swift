@@ -337,6 +337,7 @@ struct EventDetailView: View {
                 isAttending = true
                 attendeesCount += 1
             }
+            AppAnalytics.logEventJoin(eventId: firestoreId)
             #if os(iOS)
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             #endif
@@ -353,6 +354,7 @@ struct EventDetailView: View {
             "reportedBy": uid,
             "createdAt": FieldValue.serverTimestamp()
         ])
+        AppAnalytics.logReport(targetType: "event")
         #if os(iOS)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         #endif

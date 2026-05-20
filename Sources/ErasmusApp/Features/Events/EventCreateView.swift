@@ -213,6 +213,7 @@ struct EventCreateView: View {
             ]
 
             try await ref.setData(data)
+            AppAnalytics.logEventCreate(category: category, destination: city)
 
             showSuccess = true
         } catch {

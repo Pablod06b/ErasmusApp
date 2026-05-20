@@ -39,13 +39,14 @@ class FirebaseAuthManager: ObservableObject {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             await fetchUserProfile(uid: result.user.uid)
+            AppAnalytics.logLogin(method: "email")
             isLoading = false
         } catch {
             isLoading = false
             throw mapFirebaseError(error)
         }
     }
-    
+
     // MARK: - Sign Up
     func signUp(email: String, password: String, displayName: String) async throws {
         isLoading = true
@@ -71,14 +72,15 @@ class FirebaseAuthManager: ObservableObject {
             try await saveUserProfile(newUser)
             self.currentUser = newUser
             self.isAuthenticated = true
+            AppAnalytics.logSignUp(method: "email")
             isLoading = false
-            
+
         } catch {
             isLoading = false
             throw mapFirebaseError(error)
         }
     }
-    
+
     // MARK: - Complete Sign Up with Onboarding Data
     func signUpWithOnboarding(
         email: String,
@@ -124,7 +126,10 @@ class FirebaseAuthManager: ObservableObject {
             try await saveUserProfile(newUser)
             self.currentUser = newUser
             self.isAuthenticated = true
-            
+            AppAnalytics.logSignUp(method: "email")
+            AppAnalytics.logOnboardingCompleted()
+            AppAnalytics.setUserProperties(destination: destination, accountType: "student")
+
             // Handle Group Logic
             if let type = groupType, let code = groupCode, !code.isEmpty {
                 if type == "crear" {
@@ -188,13 +193,18 @@ class FirebaseAuthManager: ObservableObject {
             
             await fetchUserProfile(uid: result.user.uid)
             self.isAuthenticated = true
+            if !document.exists {
+                AppAnalytics.logSignUp(method: "google")
+            } else {
+                AppAnalytics.logLogin(method: "google")
+            }
             isLoading = false
         } catch {
             isLoading = false
             throw mapFirebaseError(error)
         }
     }
-    
+
     // MARK: - Password Reset
     func resetPassword(email: String) async throws {
         isLoading = true

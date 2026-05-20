@@ -272,6 +272,7 @@ class ChatManager: ObservableObject {
                         .collection("notifications").addDocument(data: notif)
                 }
             }
+            AppAnalytics.logMessageSend(conversationId: conversationId, type: "text")
             return true
         } catch {
             print("Error sending message: \(error.localizedDescription)")
@@ -309,6 +310,7 @@ class ChatManager: ObservableObject {
                 "lastMessage": "📷 Foto",
                 "lastMessageTime": FieldValue.serverTimestamp()
             ])
+            AppAnalytics.logMessageSend(conversationId: conversationId, type: "image")
             return true
         } catch {
             print("Error sending image: \(error.localizedDescription)")
@@ -346,7 +348,7 @@ class ChatManager: ObservableObject {
     func searchUsers(query: String) async -> [ChatUser] {
         guard let currentUserId = Auth.auth().currentUser?.uid else { return [] }
         do {
-            let snapshot = try await db.collection("users").limit(to: 50).getDocuments()
+            let snapshot = try await db.collection("users").limit(to: PageSize.users).getDocuments()
             return snapshot.documents.compactMap { doc -> ChatUser? in
                 guard doc.documentID != currentUserId else { return nil }
                 let data = doc.data()

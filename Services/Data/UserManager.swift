@@ -24,7 +24,7 @@ class UserManager: ObservableObject {
                 query = query.whereField("destination", isEqualTo: dest)
             }
 
-            query = query.limit(to: 20)
+            query = query.limit(to: PageSize.users)
             let snapshot = try await query.getDocuments()
 
             let profiles: [UserProfile] = snapshot.documents.compactMap { doc in
@@ -47,7 +47,7 @@ class UserManager: ObservableObject {
             let snapshot = try await db.collection("users")
                 .whereField("displayName", isGreaterThanOrEqualTo: searchQuery)
                 .whereField("displayName", isLessThan: searchQuery + "\u{f8ff}")
-                .limit(to: 15)
+                .limit(to: PageSize.users)
                 .getDocuments()
 
             return snapshot.documents.compactMap { try? $0.data(as: UserProfile.self) }

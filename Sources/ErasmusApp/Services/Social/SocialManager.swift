@@ -43,6 +43,7 @@ class SocialManager: ObservableObject {
         ], forDocument: theirRef)
         try await batch.commit()
         blockedUserIds.insert(targetId)
+        AppAnalytics.logUserBlock(targetUserId: targetId)
     }
 
     func unblock(userId targetId: String) async throws {
@@ -123,6 +124,7 @@ class SocialManager: ObservableObject {
             message: "Ha empezado a seguirte",
             relatedItemId: myId
         )
+        AppAnalytics.logFollow(targetUserId: targetId)
     }
 
     func unfollow(userId targetId: String) async throws {
@@ -176,6 +178,8 @@ class SocialManager: ObservableObject {
         // Add to pending list
         let targetRef = db.collection("users").document(targetId)
         try await targetRef.updateData(["pendingFriendRequestIds": FieldValue.arrayUnion([myId])])
+
+        AppAnalytics.logFriendRequestSent(targetUserId: targetId)
 
         // relatedItemId = request.id so the receiver can accept/reject using it
         await sendNotification(

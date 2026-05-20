@@ -149,7 +149,10 @@ struct HomeView: View {
             .navigationBarHidden(true)
             #endif
             .task { await loadData() }
-            .onChange(of: selectedDestination) { _ in Task { await loadData() } }
+            .onChange(of: selectedDestination) { newValue in
+                Task { await loadData() }
+                AppAnalytics.logDestinationChange(destination: newValue)
+            }
             .onChange(of: router.pendingTarget) { target in
                 guard let target = target else { return }
                 switch target {
@@ -287,6 +290,7 @@ struct ModernHeaderView: View {
                                 .background(Color(UIColor.secondarySystemBackground))
                                 .clipShape(Circle())
                         }
+                        .accessibilityLabel("Abrir mi grupo")
                     }
                     Button(action: { showNotificationsSheet = true }) {
                         ZStack(alignment: .topTrailing) {
@@ -306,6 +310,11 @@ struct ModernHeaderView: View {
                             }
                         }
                     }
+                    .accessibilityLabel(
+                        notificationManager.unreadCount > 0
+                            ? "Notificaciones, \(notificationManager.unreadCount) sin leer"
+                            : "Notificaciones"
+                    )
                     Button(action: { showCreatePostSheet = true }) {
                         Image(systemName: "plus")
                             .font(.title3).foregroundColor(.white)
@@ -313,6 +322,7 @@ struct ModernHeaderView: View {
                             .background(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
                             .clipShape(Circle())
                     }
+                    .accessibilityLabel("Crear nueva publicación")
                 }
             }
             HStack(spacing: 6) {
@@ -451,15 +461,17 @@ struct HomeTabView: View {
             refreshSeed += 1
             feedItems = buildFeed()
             await onLoadMore()
+            AppErrorManager.shared.success("Feed actualizado", icon: "sparkles")
         }
         .onAppear { feedItems = buildFeed() }
-        .onChange(of: selectedSort) { _ in
+        .onChange(of: selectedSort) { newValue in
             withAnimation(.easeInOut(duration: 0.25)) {
                 feedItems = buildFeed()
             }
             #if os(iOS)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             #endif
+            AppAnalytics.logFeedSortChange(mode: newValue.rawValue)
         }
         .onChange(of: posts.count) { _ in feedItems = buildFeed() }
         .onChange(of: eventos.count) { _ in feedItems = buildFeed() }
@@ -664,6 +676,9 @@ struct FeedPostCard: View {
             .shadow(color: .black.opacity(0.07), radius: 10, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(post.type.rawValue). \(post.title). \(post.destination)")
+        .accessibilityHint("Toca dos veces para ver el detalle")
     }
 
     @ViewBuilder
@@ -781,6 +796,9 @@ struct FeedEventCard: View {
             .shadow(color: .black.opacity(0.07), radius: 10, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Evento: \(evento.title). Categoría \(evento.category). \(evento.date). En \(evento.location).")
+        .accessibilityHint("Toca dos veces para ver el detalle")
     }
 
     private var eventGradient: some View {
@@ -869,6 +887,9 @@ struct FeedPersonCard: View {
             .shadow(color: .black.opacity(0.07), radius: 10, x: 0, y: 3)
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Perfil de \(profile.displayName) en \(profile.destination)")
+        .accessibilityHint("Toca dos veces para ver su perfil")
     }
 
     private var initials: String {

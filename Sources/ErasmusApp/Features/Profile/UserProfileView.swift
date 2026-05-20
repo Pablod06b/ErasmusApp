@@ -212,6 +212,7 @@ struct UserProfileView: View {
         .onAppear {
             loadSocialStatus()
             Task { await loadUserPosts() }
+            AppAnalytics.logProfileView(userId: user.id, isSelf: isCurrentUser)
         }
     }
 

@@ -56,22 +56,24 @@ class PostManager: ObservableObject {
     func createPost(_ post: ErasmusPost) async throws {
         isLoading = true
         do {
-            // We can convert UUID to String for Firestore ID or use auto-id
-            // Here we use the UUID as the document ID
             let data = try Firestore.Encoder().encode(post)
             try await db.collection("posts").document(post.id.uuidString).setData(data)
             await fetchPosts() // Refresh
+            AppAnalytics.logPostCreate(type: post.type.rawValue, destination: post.destination)
             isLoading = false
         } catch {
             isLoading = false
             print("Error creating post: \(error)")
+            await MainActor.run {
+                AppErrorManager.shared.report("No se pudo publicar tu post. Inténtalo de nuevo.")
+            }
             throw error
         }
     }
     
     // MARK: - Pagination Properties
     private var lastDocument: DocumentSnapshot?
-    private let pageSize = 10
+    private let pageSize = PageSize.default
     
     // MARK: - Fetch Posts (Paginated)
     func fetchInitialPosts(destination: String? = nil) async {
@@ -142,7 +144,7 @@ class PostManager: ObservableObject {
         do {
             let snapshot = try await db.collection("posts")
                 .whereField("userId", isEqualTo: userId)
-                .limit(to: 50)
+                .limit(to: PageSize.userPosts)
                 .getDocuments()
             return snapshot.documents.compactMap { try? $0.data(as: ErasmusPost.self) }
                 .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
@@ -182,6 +184,7 @@ class PostManager: ObservableObject {
                 try await ref.updateData(["likedBy": FieldValue.arrayUnion([userId])])
                 likedBy.append(userId)
             }
+            AppAnalytics.logPostLike(postId: postId, isLiked: !isCurrentlyLiked)
             return (!isCurrentlyLiked, likedBy.count)
         } catch {
             // If update fails (document missing field), set it
