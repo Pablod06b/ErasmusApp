@@ -87,7 +87,7 @@ struct HomeView: View {
     @State private var showCreatePostSheet = false
     @State private var showNotificationsSheet = false
     @State private var selectedTab: Tab = .home
-    @State private var selectedDestination = "Salamanca"
+    @AppStorage("selectedDestination") private var selectedDestination: String = "Salamanca"
     @State private var pendingChatId: String? = nil
 
     let destinations = AvailableCities.activeNames

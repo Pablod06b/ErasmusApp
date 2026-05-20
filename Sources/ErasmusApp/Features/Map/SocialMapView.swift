@@ -24,10 +24,14 @@ struct SocialMapView: View {
     @StateObject private var locationManager = LocationManager.shared
     @StateObject private var postManager = PostManager.shared
     @StateObject private var eventManager = EventManager.shared
+    @StateObject private var userManager = UserManager.shared
+
+    /// Ciudad activa (compartida con HomeView). Por defecto Salamanca.
+    @AppStorage("selectedDestination") private var selectedCity: String = "Salamanca"
 
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 40.4168, longitude: -3.7038),
+            center: CLLocationCoordinate2D(latitude: 40.9650, longitude: -5.6635), // Salamanca
             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
         )
     )
@@ -35,20 +39,22 @@ struct SocialMapView: View {
     @State private var selectedAnnotation: MapAnnotationItem? = nil
     @State private var showAnnotationSheet = false
 
+    /// Annotations cargadas desde Firestore + geocoding
+    @State private var loadedAnnotations: [MapAnnotationItem] = []
+    @State private var isGeocoding = false
+
     enum MapFilter: String, CaseIterable {
         case all = "Todo"
         case events = "Eventos"
-        case recommendations = "Lugares"
+        case recommendations = "Posts"
         case people = "Personas"
-        case housing = "Pisos"
 
         var icon: String {
             switch self {
             case .all: return "map.fill"
             case .events: return "sparkles"
-            case .recommendations: return "star.fill"
+            case .recommendations: return "newspaper.fill"
             case .people: return "person.2.fill"
-            case .housing: return "house.fill"
             }
         }
 
@@ -58,13 +64,22 @@ struct SocialMapView: View {
             case .events: return .purple
             case .recommendations: return .orange
             case .people: return .green
-            case .housing: return .teal
             }
         }
     }
 
-    // Sample annotations (in production, pull from Firebase with coordinates)
+    /// Filtrado de annotations cargadas
     var annotations: [MapAnnotationItem] {
+        switch selectedFilter {
+        case .all: return loadedAnnotations
+        case .events: return loadedAnnotations.filter { $0.type == .event }
+        case .recommendations: return loadedAnnotations.filter { $0.type == .recommendation }
+        case .people: return loadedAnnotations.filter { $0.type == .person }
+        }
+    }
+
+    // El catálogo anterior con annotations hardcoded está obsoleto.
+    private var legacyHardcodedAnnotations: [MapAnnotationItem] {
         let base: [MapAnnotationItem] = [
             MapAnnotationItem(
                 id: "ev1",
@@ -122,13 +137,7 @@ struct SocialMapView: View {
             )
         ]
 
-        switch selectedFilter {
-        case .all: return base
-        case .events: return base.filter { $0.type == .event }
-        case .recommendations: return base.filter { $0.type == .recommendation }
-        case .people: return base.filter { $0.type == .person }
-        case .housing: return base.filter { $0.type == .housing }
-        }
+        return base
     }
 
     var body: some View {
@@ -181,8 +190,122 @@ struct SocialMapView: View {
             .onAppear {
                 locationManager.requestAuthorization()
                 locationManager.requestLocation()
-                // Camera starts at Madrid by default; real location is fetched in background
+                centerOnSelectedCity()
+                Task { await reloadAnnotations() }
             }
+            .onChange(of: selectedCity) { _ in
+                centerOnSelectedCity()
+                Task { await reloadAnnotations() }
+            }
+            .onChange(of: postManager.posts.count) { _ in
+                Task { await reloadAnnotations() }
+            }
+            .onChange(of: eventManager.events.count) { _ in
+                Task { await reloadAnnotations() }
+            }
+            .overlay(alignment: .topTrailing) {
+                if isGeocoding {
+                    HStack(spacing: 6) {
+                        ProgressView().scaleEffect(0.7)
+                        Text("Cargando...").font(.caption)
+                    }
+                    .padding(.horizontal, 10).padding(.vertical, 6)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .padding(.top, 60).padding(.trailing, 16)
+                }
+            }
+        }
+    }
+
+    // MARK: - Centrado en ciudad
+
+    private func centerOnSelectedCity() {
+        guard let coord = GeocodeCache.shared.coordinatesForActiveCity(selectedCity) else { return }
+        withAnimation(.easeInOut) {
+            cameraPosition = .region(MKCoordinateRegion(
+                center: coord,
+                span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)
+            ))
+        }
+    }
+
+    // MARK: - Carga real de annotations
+
+    /// Construye annotations desde:
+    /// - Eventos de la ciudad actual (geocodificados por location)
+    /// - Posts con location de la ciudad actual (geocodificados)
+    /// - Personas recomendadas (centradas en la ciudad — sin ubicación exacta)
+    private func reloadAnnotations() async {
+        await MainActor.run { isGeocoding = true }
+        defer { Task { @MainActor in isGeocoding = false } }
+
+        var result: [MapAnnotationItem] = []
+        let cityCenter = GeocodeCache.shared.coordinatesForActiveCity(selectedCity)
+            ?? CLLocationCoordinate2D(latitude: 40.4168, longitude: -3.7038)
+
+        // 1) Eventos
+        let cityEvents = eventManager.events.filter { evt in
+            (evt.city == selectedCity) || evt.location.localizedCaseInsensitiveContains(selectedCity)
+        }
+        for evt in cityEvents.prefix(40) {
+            let query = "\(evt.location), \(evt.city ?? selectedCity)"
+            if let coord = await GeocodeCache.shared.coordinates(for: query) {
+                result.append(MapAnnotationItem(
+                    id: "event_\(evt.id)",
+                    coordinate: coord,
+                    type: .event,
+                    title: evt.title,
+                    subtitle: "\(evt.date) · \(evt.category)",
+                    color: .purple,
+                    icon: "sparkles"
+                ))
+            }
+        }
+
+        // 2) Posts con location
+        let cityPosts = postManager.posts.filter {
+            $0.destination == selectedCity && ($0.location ?? "").isEmpty == false
+        }
+        for post in cityPosts.prefix(40) {
+            guard let loc = post.location, !loc.isEmpty else { continue }
+            let query = "\(loc), \(selectedCity)"
+            if let coord = await GeocodeCache.shared.coordinates(for: query) {
+                result.append(MapAnnotationItem(
+                    id: "post_\(post.id)",
+                    coordinate: coord,
+                    type: .recommendation,
+                    title: post.title,
+                    subtitle: post.type.rawValue,
+                    color: .orange,
+                    icon: "newspaper.fill"
+                ))
+            }
+        }
+
+        // 3) Personas — distribuidas alrededor del centro de la ciudad
+        let cityPeople = userManager.recommendedProfiles.filter { $0.destination == selectedCity }
+        for (i, person) in cityPeople.prefix(20).enumerated() {
+            // Distribución circular alrededor del centro (radio ~1km)
+            let angle = Double(i) / Double(max(cityPeople.count, 1)) * 2 * .pi
+            let radius = 0.008 // ~900m
+            let coord = CLLocationCoordinate2D(
+                latitude: cityCenter.latitude + cos(angle) * radius,
+                longitude: cityCenter.longitude + sin(angle) * radius
+            )
+            result.append(MapAnnotationItem(
+                id: "person_\(person.id)",
+                coordinate: coord,
+                type: .person,
+                title: person.displayName,
+                subtitle: person.university.isEmpty ? "Erasmus en \(selectedCity)" : person.university,
+                color: .green,
+                icon: "person.fill"
+            ))
+        }
+
+        await MainActor.run {
+            loadedAnnotations = result
         }
     }
 
