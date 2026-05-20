@@ -181,7 +181,7 @@ struct ExploreView: View {
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
                 ForEach(filtered) { city in
-                    NavigationLink(destination: CityDetailView(city: city)) {
+                    NavigationLink(destination: CityGuideView(city: city)) {
                         CityCardView(city: city)
                     }
                     .buttonStyle(PlainButtonStyle())

@@ -87,7 +87,7 @@ struct DestinationExplorerView: View {
                             spacing: 14
                         ) {
                             ForEach(filteredCities) { city in
-                                NavigationLink(destination: CityDetailView(city: city)) {
+                                NavigationLink(destination: CityGuideView(city: city)) {
                                     DestinationCityCard(city: city)
                                 }
                                 .buttonStyle(PlainButtonStyle())
@@ -164,7 +164,7 @@ struct DestinationExplorerView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     ForEach(savedCities) { city in
-                        NavigationLink(destination: CityDetailView(city: city)) {
+                        NavigationLink(destination: CityGuideView(city: city)) {
                             HStack(spacing: 8) {
                                 Text(city.countryFlag)
                                     .font(.title3)
