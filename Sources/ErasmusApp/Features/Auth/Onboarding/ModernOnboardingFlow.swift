@@ -398,34 +398,63 @@ struct ModernOnboardingFlow: View {
         }
     }
     
+    @State private var pendingComingSoonCity: AppCity? = nil
+
     private var destinoAView: some View {
         VStack(spacing: 24) {
-            ModernSearchField(
-                title: "Buscar destino",
-                placeholder: "Escribe tu ciudad...",
-                text: $destinoBusqueda,
-                selection: $destinoSeleccionado,
-                suggestions: sampleDestinos(),
-                icon: "🗺️"
-            )
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Ciudades populares")
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Disponibles ahora")
                     .font(.headline)
                     .foregroundColor(.primary)
 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                    ForEach(["Salamanca", "Madrid", "Barcelona", "Valencia", "Sevilla", "Granada"], id: \.self) { city in
+                    ForEach(AvailableCities.active) { city in
                         ModernCityCard(
-                            city: city,
-                            isSelected: destinoSeleccionado == city
+                            city: city.name,
+                            isSelected: destinoSeleccionado == city.name
                         ) {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                destinoSeleccionado = city
+                                destinoSeleccionado = city.name
                             }
                         }
                     }
                 }
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text("Próximamente")
+                        .font(.headline).foregroundColor(.primary)
+                    Spacer()
+                    Text("Apúntate y te avisamos")
+                        .font(.caption).foregroundColor(.secondary)
+                }
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 10) {
+                    ForEach(AvailableCities.comingSoon) { city in
+                        Button(action: { pendingComingSoonCity = city }) {
+                            HStack(spacing: 6) {
+                                Text(city.flag)
+                                Text(city.name)
+                                    .font(.subheadline).fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Image(systemName: "bell.badge")
+                                    .font(.caption).foregroundColor(.orange)
+                            }
+                            .padding(.horizontal, 12).padding(.vertical, 10)
+                            .background(Color(UIColor.secondarySystemBackground))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.orange.opacity(0.25), lineWidth: 1)
+                            )
+                            .cornerRadius(10)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+            }
+            .sheet(item: $pendingComingSoonCity) { city in
+                CityComingSoonView(city: city)
             }
 
             VStack(alignment: .leading, spacing: 8) {

@@ -183,15 +183,20 @@ struct ChatDetailView: View {
         VStack(spacing: 0) {
             // Error banner
             if let error = chatManager.messagesError {
-                HStack {
+                HStack(spacing: 8) {
                     Image(systemName: "wifi.exclamationmark")
-                    Text("Error de conexión. Revisa las reglas de Firestore.")
-                        .font(.caption)
+                    Text(error)
+                        .font(.caption).fontWeight(.medium)
+                        .lineLimit(2)
+                    Spacer(minLength: 4)
+                    Image(systemName: "xmark")
+                        .font(.caption2).fontWeight(.semibold)
+                        .foregroundColor(.white.opacity(0.85))
                 }
                 .foregroundColor(.white)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(Color.red.opacity(0.85))
+                .background(Color.orange.opacity(0.92))
                 .transition(.move(edge: .top))
                 .onTapGesture { chatManager.messagesError = nil }
             }

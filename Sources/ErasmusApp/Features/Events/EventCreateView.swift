@@ -28,9 +28,7 @@ struct EventCreateView: View {
     @State private var errorMessage = ""
     @State private var showSuccess = false
 
-    private let cities = ["Salamanca", "Madrid", "Barcelona", "Valencia", "Roma",
-                          "París", "Berlín", "Lisboa", "Milán", "Ámsterdam",
-                          "Praga", "Viena", "Budapest", "Varsovia", "Dublín"]
+    private let cities = AvailableCities.activeNames
 
     private let categories = ["Social", "Deporte", "Cultura", "Música",
                                "Gastronomía", "Tecnología", "Arte", "Naturaleza", "Otro"]

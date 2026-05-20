@@ -72,6 +72,12 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      // Subcolección de asistentes: cada usuario gestiona su propia asistencia
+      match /attendees/{userId} {
+        allow read: if isSignedIn();
+        allow write: if isOwner(userId);
+      }
     }
 
     // ---------- open plans ----------
@@ -127,6 +133,36 @@ service cloud.firestore {
       allow read: if false;
       allow create: if isSignedIn();
       allow update, delete: if false;
+    }
+
+    // ---------- bugReports ----------
+    // Write-only desde la app: el usuario puede mandar un reporte de bug
+    match /bugReports/{reportId} {
+      allow read: if false;
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+
+    // ---------- cityRequests ----------
+    // El usuario se apunta para recibir notificación cuando se active una ciudad.
+    // Read público para mostrar el contador. Write controlado para que solo
+    // se pueda añadir/quitar el propio uid al array.
+    match /cityRequests/{cityName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // ---------- moderationStats ----------
+    match /moderationStats/{doc} {
+      allow read: if false;
+      allow write: if false; // solo Cloud Functions con admin SDK
+    }
+
+    // ---------- appConfig ----------
+    // Configuración remota (kill switch, maintenance flag, etc.)
+    match /appConfig/{doc} {
+      allow read: if true;  // todos pueden leer para activar maintenance mode
+      allow write: if false; // sólo admin manualmente desde Firebase Console
     }
   }
 }

@@ -39,7 +39,7 @@ struct CreatePostView: View {
     @State private var showErrorAlert = false
     @Environment(\.dismiss) var dismiss
 
-    let destinations = ["Salamanca", "Madrid", "Barcelona", "Valencia"]
+    let destinations = AvailableCities.activeNames
     
     init(posts: Binding<[ErasmusPost]>, showSheet: Binding<Bool>, preselectedType: PostType = .event) {
         self._posts = posts

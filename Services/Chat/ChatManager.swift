@@ -122,10 +122,16 @@ class ChatManager: ObservableObject {
 
     // MARK: - Direct Messages
 
+    /// Conteo de fallos consecutivos del listener de mensajes.
+    /// Solo mostramos el banner de error tras 3 fallos seguidos para evitar
+    /// flashes transitorios al recién crear una conversación o por latencia.
+    private var messagesErrorStreak: Int = 0
+
     func startListeningToMessages(conversationId: String) {
         guard !conversationId.isEmpty else { return }
         isLoadingMessages = true
         messagesError = nil
+        messagesErrorStreak = 0
         messages = []
         messagesListener?.remove()
 
@@ -138,14 +144,21 @@ class ChatManager: ObservableObject {
                     guard let self else { return }
                     if let error = error {
                         print("Messages listener error: \(error.localizedDescription)")
-                        self.messagesError = error.localizedDescription
+                        self.messagesErrorStreak += 1
                         self.isLoadingMessages = false
+                        // Solo enseña el banner si falla >=3 veces seguidas
+                        if self.messagesErrorStreak >= 3 {
+                            self.messagesError = "No podemos cargar los mensajes. Comprueba tu conexión."
+                        }
                         return
                     }
                     guard let documents = snapshot?.documents else {
                         self.isLoadingMessages = false
                         return
                     }
+                    // Reset error streak en éxito
+                    self.messagesErrorStreak = 0
+                    self.messagesError = nil
                     self.messages = documents.compactMap { doc -> ChatMessage? in
                         // Manual decode to handle Firestore Timestamp → Date
                         let data = doc.data()

@@ -90,7 +90,7 @@ struct HomeView: View {
     @State private var selectedDestination = "Salamanca"
     @State private var pendingChatId: String? = nil
 
-    let destinations = ["Salamanca", "Madrid", "Barcelona", "Valencia", "Roma", "París", "Berlín", "Lisboa", "Milán", "Ámsterdam"]
+    let destinations = AvailableCities.activeNames
 
     var body: some View {
         NavigationStack {
@@ -325,17 +325,10 @@ struct ModernHeaderView: View {
                     .accessibilityLabel("Crear nueva publicación")
                 }
             }
-            HStack(spacing: 6) {
-                Image(systemName: "location.fill").foregroundColor(.blue).font(.caption)
-                Picker("Destino", selection: $selectedDestination) {
-                    ForEach(destinations, id: \.self) { city in Text(city).tag(city) }
-                }
-                .pickerStyle(.menu)
-                .font(.subheadline).fontWeight(.medium)
-                Spacer()
-            }
-            .padding(.horizontal, 14).padding(.vertical, 10)
-            .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.secondarySystemBackground)))
+            // Selector de ciudad unificado (con "Próximamente" + Avísame)
+            CityPicker(selected: $selectedDestination)
+                .padding(.horizontal, 14).padding(.vertical, 10)
+                .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.secondarySystemBackground)))
         }
         .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 12)
         .background(Rectangle().fill(.ultraThinMaterial).ignoresSafeArea())

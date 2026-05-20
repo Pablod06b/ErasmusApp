@@ -40,9 +40,7 @@ struct ModernCreatePostView: View {
         }
     }
 
-    let destinations = ["Salamanca", "Madrid", "Barcelona", "Valencia", "Roma",
-                        "París", "Berlín", "Lisboa", "Milán", "Ámsterdam",
-                        "Praga", "Viena", "Budapest", "Varsovia", "Dublín"]
+    let destinations = AvailableCities.activeNames
     
     var body: some View {
         NavigationView {
