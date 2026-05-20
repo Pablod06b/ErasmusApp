@@ -44,6 +44,35 @@ struct UserProfileView: View {
     @State private var showChatSheet = false
     @State private var chatConversationId: String? = nil
     @State private var isLoadingUserPosts = false
+
+    // Modal seguidores/seguidos/amigos (estilo Insta)
+    @State private var followListKind: FollowListKind? = nil
+
+    // MARK: - Share
+    /// URL pública del perfil (deeplink + web). Cuando configures el dominio
+    /// erasmusconnect.app con Universal Links, abrirá directamente en la app.
+    private var profileShareURL: URL {
+        let slug = user.username.isEmpty ? user.id : user.username
+        return URL(string: "https://erasmusconnect.app/u/\(slug)") ?? URL(string: "https://erasmusconnect.app")!
+    }
+    private var profileShareMessage: String {
+        if user.currentDestination.isEmpty {
+            return "Mira el perfil de \(user.name) en ErasmusConnect"
+        } else {
+            return "Conoce a \(user.name), en Erasmus en \(user.currentDestination). Únete a ErasmusConnect 👇"
+        }
+    }
+    private var followListUserIds: [String] {
+        guard let kind = followListKind else { return [] }
+        // Si no es mi propio perfil, uso los ids del UserProfile completo si los tengo cargados.
+        // Para simplificar, usamos los ids del propio user object (followerIds, friendIds) del display target.
+        switch kind {
+        case .followers: return user.followerIds
+        case .following: return authManager.currentUser?.id == user.id ? (authManager.currentUser?.followingIds ?? []) : []
+        case .friends:   return user.friendIds
+        case .posts:     return []
+        }
+    }
     
     // Geometry reading for parallax
     let headerHeight: CGFloat = 350
@@ -257,6 +286,11 @@ struct UserProfileView: View {
             Spacer()
             
             Menu {
+                // Compartir está siempre disponible
+                ShareLink(item: profileShareURL, message: Text(profileShareMessage)) {
+                    Label("Compartir perfil", systemImage: "square.and.arrow.up")
+                }
+
                 if isCurrentUser {
                     Button(action: { showSettings = true }) {
                         Label("Ajustes", systemImage: "gearshape")
@@ -526,13 +560,30 @@ struct UserProfileView: View {
     // MARK: - Mini Stats (Glass Card)
     private var statsSection: some View {
         HStack(spacing: 0) {
-            StatItem(value: "\(userOwnPosts.filter { $0.type == .recommendation }.count)", title: "Recomend.")
-            Divider().frame(height: 30).padding(.horizontal, 8)
-            StatItem(value: "\(userOwnPosts.filter { $0.type == .event }.count)", title: "Eventos")
-            Divider().frame(height: 30).padding(.horizontal, 8)
-            StatItem(value: "\(userOwnPosts.filter { $0.type == .personalPlan }.count)", title: "Planes")
-            Divider().frame(height: 30).padding(.horizontal, 8)
-            StatItem(value: "\(user.followerIds.count)", title: "Seguidores")
+            // Publicaciones (no abre modal, scroll a sección)
+            StatButton(value: "\(userOwnPosts.count)", title: "Posts") {
+                // Se podría hacer scroll, por ahora no acción
+            }
+            Divider().frame(height: 36).padding(.horizontal, 4)
+
+            // Seguidores → abre modal estilo Insta
+            StatButton(value: "\(user.followerIds.count)", title: "Seguidores") {
+                followListKind = .followers
+            }
+            Divider().frame(height: 36).padding(.horizontal, 4)
+
+            // Siguiendo (solo si es mi propio perfil, porque sólo tengo mis followingIds)
+            if isCurrentUser, let following = authManager.currentUser?.followingIds {
+                StatButton(value: "\(following.count)", title: "Siguiendo") {
+                    followListKind = .following
+                }
+                Divider().frame(height: 36).padding(.horizontal, 4)
+            }
+
+            // Amigos
+            StatButton(value: "\(user.friendIds.count)", title: "Amigos") {
+                followListKind = .friends
+            }
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 12)
@@ -544,6 +595,10 @@ struct UserProfileView: View {
         )
         .shadow(color: .black.opacity(0.04), radius: 10, x: 0, y: 5)
         .padding(.horizontal, 20)
+        .sheet(item: $followListKind) { kind in
+            FollowListView(kind: kind, userIds: followListUserIds)
+                .environmentObject(authManager)
+        }
     }
     
     // MARK: - About Me (Frosted Card)
@@ -807,14 +862,14 @@ struct UserProfileView: View {
 struct StatItem: View {
     let value: String
     let title: String
-    
+
     var body: some View {
         VStack(spacing: 4) {
             Text(value)
                 .font(.headline)
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
-            
+
             Text(title)
                 .font(.caption2)
                 .foregroundColor(.secondary)
@@ -823,101 +878,116 @@ struct StatItem: View {
     }
 }
 
+/// Versión clicable de StatItem para abrir modales tipo Instagram al pulsar el número.
+struct StatButton: View {
+    let value: String
+    let title: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(value)
+                    .font(.headline).fontWeight(.bold)
+                    .foregroundColor(.primary)
+                Text(title)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PlainButtonStyle())
+        .accessibilityHint("Toca dos veces para ver la lista")
+    }
+}
+
 // MARK: - Edit Profile View (Placeholder)
+/// Edición de perfil completa — todos los campos del onboarding en una sola pantalla.
 struct EditProfileView: View {
     let user: ExtendedUserProfile
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authManager: FirebaseAuthManager
     @StateObject private var profileManager = UserProfileManager.shared
-    
+
+    // MARK: - Campos editables
     @State private var name: String = ""
+    @State private var username: String = ""
     @State private var bio: String = ""
     @State private var university: String = ""
     @State private var career: String = ""
     @State private var destination: String = ""
-    
+    @State private var originCountry: String = "España"
+    @State private var originCity: String = ""
+    @State private var erasmusStatus: String = ""
+    @State private var erasmusStartDate: Date = Date()
+    @State private var hasStartDate: Bool = false
+    @State private var interests: [String] = []
+    @State private var languages: [LanguageLevel] = []
+
+    // Privacidad
+    @State private var isPrivateAccount: Bool = false
+    @State private var showOnlineStatus: Bool = true
+
+    // Foto
     @State private var selectedItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
+
+    // UI state
     @State private var isSaving = false
-    
+    @State private var saveError: String?
+    @State private var showAddInterest = false
+    @State private var newInterest: String = ""
+    @State private var showAddLanguage = false
+
+    private let erasmusStatusOptions = [
+        "future":  "Voy a hacer Erasmus",
+        "current": "Estoy haciendo Erasmus",
+        "past":    "Ya hice Erasmus",
+        "local":   "Local, no Erasmus"
+    ]
+
+    private let popularInterests = [
+        "🎉 Fiesta", "🎭 Cultura", "🍕 Gastronomía", "📸 Fotografía",
+        "✈️ Viajes", "⚽ Deporte", "🎵 Música", "📚 Literatura",
+        "🎨 Arte", "🏛️ Historia", "🌿 Naturaleza", "🎮 Gaming",
+        "💻 Tech", "🍻 Bares", "🎬 Cine"
+    ]
+
+    private let countries = ["España", "Italia", "Francia", "Alemania", "Portugal",
+                             "Reino Unido", "Países Bajos", "Polonia", "Otro"]
+
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
-                Section {
-                    HStack {
-                        Spacer()
-                        VStack {
-                            if let selectedImage = selectedImage {
-                                Image(uiImage: selectedImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 100, height: 100)
-                                    .clipShape(Circle())
-                            } else if let photoURL = authManager.currentUser?.photoURL, let url = URL(string: photoURL), !photoURL.isEmpty {
-                                AsyncImage(url: url) { image in
-                                    image.resizable()
-                                } placeholder: {
-                                    Color.gray
-                                }
-                                .scaledToFill()
-                                .frame(width: 100, height: 100)
-                                .clipShape(Circle())
-                            } else {
-                                Image(systemName: "person.circle.fill")
-                                    .resizable()
-                                    .foregroundColor(.gray)
-                                    .frame(width: 100, height: 100)
-                            }
-                            
-                            PhotosPicker(selection: $selectedItem, matching: .images) {
-                                Text("Cambiar foto")
-                                    .foregroundColor(.blue)
-                            }
-                        }
-                        Spacer()
-                    }
-                }
-                .listRowBackground(Color.clear)
-                
-                Section("Información Personal") {
-                    TextField("Nombre", text: $name)
-                    TextField("Biografía", text: $bio, axis: .vertical)
-                        .lineLimit(3...6)
-                }
-                
-                Section("Erasmus") {
-                    TextField("Universidad de Origen", text: $university)
-                    TextField("Carrera", text: $career)
-                    TextField("Destino", text: $destination)
-                }
-                
-                if isSaving {
-                    Section {
-                        HStack {
-                            Spacer()
-                            ProgressView("Guardando...")
-                            Spacer()
-                        }
-                    }
+                photoSection
+                basicInfoSection
+                originSection
+                academicSection
+                erasmusSection
+                languagesSection
+                interestsSection
+                privacySection
+
+                if let saveError = saveError {
+                    Section { Text(saveError).foregroundColor(.red).font(.footnote) }
                 }
             }
-            .navigationTitle("Editar Perfil")
+            .navigationTitle("Editar perfil")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancelar") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Guardar") {
-                        Task {
-                            await saveChanges()
-                        }
+                    Button(isSaving ? "Guardando..." : "Guardar") {
+                        Task { await saveChanges() }
                     }
                     .fontWeight(.semibold)
-                    .disabled(isSaving)
+                    .disabled(isSaving || name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
-            .onChange(of: selectedItem) { _, newItem in
+            .onChange(of: selectedItem) { newItem in
                 Task {
                     if let data = try? await newItem?.loadTransferable(type: Data.self),
                        let uiImage = UIImage(data: data) {
@@ -925,39 +995,357 @@ struct EditProfileView: View {
                     }
                 }
             }
-            .onAppear {
-                name = user.name
-                bio = user.bio ?? ""
-                university = user.university
-                career = user.career
-                destination = user.currentDestination
+            .onAppear { loadCurrent() }
+            .sheet(isPresented: $showAddLanguage) {
+                AddLanguageSheet { newLang in
+                    languages.append(newLang)
+                }
             }
         }
     }
-    
+
+    // MARK: - Sections
+
+    private var photoSection: some View {
+        Section {
+            HStack {
+                Spacer()
+                VStack(spacing: 10) {
+                    Group {
+                        if let img = selectedImage {
+                            Image(uiImage: img).resizable().scaledToFill()
+                        } else {
+                            UserAvatarView(photoURL: authManager.currentUser?.photoURL, name: name, size: 110)
+                        }
+                    }
+                    .frame(width: 110, height: 110)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 3))
+
+                    PhotosPicker(selection: $selectedItem, matching: .images) {
+                        Label("Cambiar foto", systemImage: "camera.fill")
+                            .font(.footnote).fontWeight(.semibold)
+                            .foregroundColor(.blue)
+                    }
+                }
+                Spacer()
+            }
+            .padding(.vertical, 8)
+        }
+        .listRowBackground(Color.clear)
+    }
+
+    private var basicInfoSection: some View {
+        Section(header: Text("Información básica")) {
+            TextField("Nombre", text: $name)
+            HStack {
+                Text("@").foregroundColor(.secondary)
+                TextField("usuario", text: $username)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+            }
+            TextField("Biografía", text: $bio, axis: .vertical)
+                .lineLimit(3...6)
+        }
+    }
+
+    private var originSection: some View {
+        Section(header: Text("De dónde eres")) {
+            Picker("País", selection: $originCountry) {
+                ForEach(countries, id: \.self) { Text($0).tag($0) }
+            }
+            TextField("Ciudad de origen", text: $originCity)
+        }
+    }
+
+    private var academicSection: some View {
+        Section(header: Text("Académico")) {
+            TextField("Universidad", text: $university)
+            TextField("Carrera o estudios", text: $career)
+        }
+    }
+
+    private var erasmusSection: some View {
+        Section(header: Text("Erasmus")) {
+            // Estado
+            Picker("Estado", selection: $erasmusStatus) {
+                Text("Selecciona...").tag("")
+                ForEach(Array(erasmusStatusOptions.keys), id: \.self) { key in
+                    Text(erasmusStatusOptions[key] ?? key).tag(key)
+                }
+            }
+
+            // Destino con CityPicker (solo activas, próximamente avisa)
+            HStack {
+                Text("Destino").foregroundColor(.primary)
+                Spacer()
+                CityPicker(selected: $destination, label: "Elige")
+                    .frame(maxWidth: 200, alignment: .trailing)
+            }
+
+            // Fecha inicio
+            Toggle("Fecha de inicio", isOn: $hasStartDate)
+            if hasStartDate {
+                DatePicker("", selection: $erasmusStartDate, displayedComponents: [.date])
+                    .datePickerStyle(.compact)
+                    .labelsHidden()
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
+    }
+
+    private var languagesSection: some View {
+        Section(header: HStack {
+            Text("Idiomas")
+            Spacer()
+            Button { showAddLanguage = true } label: {
+                Image(systemName: "plus.circle.fill").foregroundColor(.blue)
+            }
+        }) {
+            if languages.isEmpty {
+                Text("Aún no has añadido ningún idioma")
+                    .font(.caption).foregroundColor(.secondary)
+            } else {
+                ForEach(languages) { lang in
+                    HStack {
+                        Text(lang.language)
+                        Spacer()
+                        Text(lang.level)
+                            .font(.caption).foregroundColor(.secondary)
+                            .padding(.horizontal, 8).padding(.vertical, 3)
+                            .background(Color.blue.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                }
+                .onDelete { offsets in languages.remove(atOffsets: offsets) }
+            }
+        }
+    }
+
+    private var interestsSection: some View {
+        Section(header: Text("Intereses")) {
+            // Chips de mis intereses
+            if !interests.isEmpty {
+                FlowLayout(spacing: 6) {
+                    ForEach(interests, id: \.self) { interest in
+                        Button(action: { interests.removeAll { $0 == interest } }) {
+                            HStack(spacing: 4) {
+                                Text(interest).font(.caption)
+                                Image(systemName: "xmark").font(.caption2)
+                            }
+                            .padding(.horizontal, 10).padding(.vertical, 5)
+                            .background(Color.blue.opacity(0.15))
+                            .foregroundColor(.blue)
+                            .clipShape(Capsule())
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+
+            // Sugerencias para añadir
+            Text("Toca para añadir / quitar")
+                .font(.caption2).foregroundColor(.secondary)
+            FlowLayout(spacing: 6) {
+                ForEach(popularInterests, id: \.self) { item in
+                    let isSelected = interests.contains(item)
+                    Button(action: { toggleInterest(item) }) {
+                        Text(item)
+                            .font(.caption)
+                            .padding(.horizontal, 10).padding(.vertical, 5)
+                            .background(isSelected ? Color.blue.opacity(0.2) : Color(UIColor.tertiarySystemBackground))
+                            .foregroundColor(isSelected ? .blue : .primary)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(isSelected ? Color.blue : Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    private var privacySection: some View {
+        Section(header: Text("Privacidad")) {
+            Toggle(isOn: $isPrivateAccount) {
+                Label("Cuenta privada", systemImage: "lock.fill")
+            }
+            Toggle(isOn: $showOnlineStatus) {
+                Label("Mostrar cuándo estoy online", systemImage: "circle.fill")
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    private func toggleInterest(_ item: String) {
+        if let idx = interests.firstIndex(of: item) {
+            interests.remove(at: idx)
+        } else {
+            interests.append(item)
+        }
+    }
+
+    private func loadCurrent() {
+        guard let me = authManager.currentUser else { return }
+        name = me.displayName
+        username = me.username
+        bio = me.bio
+        university = me.university
+        career = me.career
+        destination = me.destination
+        originCountry = me.originCountry
+        originCity = me.originCity
+        erasmusStatus = me.erasmusStatus
+        interests = me.interests
+        languages = me.languages
+        isPrivateAccount = me.permissions.isPrivateAccount
+        showOnlineStatus = me.permissions.showOnlineStatus
+        if let dateStr = me.erasmusStartDate {
+            let fmt = DateFormatter()
+            fmt.locale = Locale(identifier: "es_ES")
+            fmt.dateFormat = "MMM yyyy"
+            if let d = fmt.date(from: dateStr.lowercased().capitalized) {
+                erasmusStartDate = d
+                hasStartDate = true
+            }
+        }
+    }
+
     private func saveChanges() async {
         guard let userId = authManager.currentUser?.id else { return }
         isSaving = true
-        
+        saveError = nil
+
         do {
             if let newImage = selectedImage {
-               let _ = try await profileManager.uploadProfileImage(newImage, userId: userId)
+                _ = try await profileManager.uploadProfileImage(newImage, userId: userId)
             }
-            let updates: [String: Any] = [
-                "displayName": name,
+
+            // Languages como array de dicts (Codable manual para Firestore)
+            let languagesData: [[String: Any]] = languages.map {
+                ["id": $0.id, "language": $0.language, "level": $0.level]
+            }
+
+            var updates: [String: Any] = [
+                "displayName": name.trimmingCharacters(in: .whitespaces),
+                "username": username.trimmingCharacters(in: .whitespaces),
                 "bio": bio,
                 "university": university,
                 "career": career,
-                "destination": destination
+                "destination": destination,
+                "originCountry": originCountry,
+                "originCity": originCity,
+                "erasmusStatus": erasmusStatus,
+                "interests": interests,
+                "languages": languagesData,
+                "permissions.isPrivateAccount": isPrivateAccount,
+                "permissions.showOnlineStatus": showOnlineStatus
             ]
+            if hasStartDate {
+                let fmt = DateFormatter()
+                fmt.locale = Locale(identifier: "es_ES")
+                fmt.dateFormat = "MMM yyyy"
+                updates["erasmusStartDate"] = fmt.string(from: erasmusStartDate).capitalized
+            }
+
             try await profileManager.updateUserProfile(userId: userId, updates: updates)
-            let _ = try await authManager.getUserProfile()
-            
-            isSaving = false
-            dismiss()
+            _ = try await authManager.getUserProfile()
+
+            await MainActor.run {
+                AppErrorManager.shared.success("Perfil actualizado", icon: "checkmark.circle.fill")
+                isSaving = false
+                dismiss()
+            }
         } catch {
-            print("Error parsing profile: \(error)")
-            isSaving = false
+            print("Error guardando perfil: \(error)")
+            await MainActor.run {
+                saveError = "No se pudo guardar: \(error.localizedDescription)"
+                isSaving = false
+            }
+        }
+    }
+}
+
+// MARK: - FlowLayout (chips wrap)
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard !subviews.isEmpty else { return .zero }
+        let width = proposal.width ?? .infinity
+        var totalHeight: CGFloat = 0
+        var lineWidth: CGFloat = 0
+        var lineHeight: CGFloat = 0
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if lineWidth + size.width > width {
+                totalHeight += lineHeight + spacing
+                lineWidth = size.width + spacing
+                lineHeight = size.height
+            } else {
+                lineWidth += size.width + spacing
+                lineHeight = max(lineHeight, size.height)
+            }
+        }
+        totalHeight += lineHeight
+        return CGSize(width: width, height: totalHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var x: CGFloat = bounds.minX
+        var y: CGFloat = bounds.minY
+        var lineHeight: CGFloat = 0
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if x + size.width > bounds.maxX {
+                x = bounds.minX
+                y += lineHeight + spacing
+                lineHeight = 0
+            }
+            view.place(at: CGPoint(x: x, y: y), proposal: .init(size))
+            x += size.width + spacing
+            lineHeight = max(lineHeight, size.height)
+        }
+    }
+}
+
+// MARK: - AddLanguageSheet
+struct AddLanguageSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    var onAdd: (LanguageLevel) -> Void
+
+    @State private var language: String = "Español"
+    @State private var level: String = "Nativo"
+
+    private let languages = ["Español", "Inglés", "Francés", "Italiano", "Alemán",
+                             "Portugués", "Catalán", "Gallego", "Euskera", "Chino", "Árabe"]
+    private let levels = ["Básico", "Intermedio", "Avanzado", "Nativo"]
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Picker("Idioma", selection: $language) {
+                    ForEach(languages, id: \.self) { Text($0).tag($0) }
+                }
+                Picker("Nivel", selection: $level) {
+                    ForEach(levels, id: \.self) { Text($0).tag($0) }
+                }
+            }
+            .navigationTitle("Añadir idioma")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancelar") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Añadir") {
+                        onAdd(LanguageLevel(language: language, level: level))
+                        dismiss()
+                    }.fontWeight(.semibold)
+                }
+            }
         }
     }
 }
