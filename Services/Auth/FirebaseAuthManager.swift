@@ -250,6 +250,10 @@ class FirebaseAuthManager: ObservableObject {
                 self.isAuthenticated = true
                 // Sincroniza set de bloqueados para filtros instantáneos
                 await SocialManager.shared.loadBlockedUsers()
+                // Carga favoritos para que los botones bookmark muestren el estado real
+                await MainActor.run {
+                    FavoritesManager.shared.loadFavorites(for: uid)
+                }
             } else {
                 // User exists in Auth but not in Firestore (rare edge case)
                 self.isAuthenticated = false

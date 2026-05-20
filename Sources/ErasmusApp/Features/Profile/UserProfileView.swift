@@ -44,6 +44,7 @@ struct UserProfileView: View {
     @State private var showChatSheet = false
     @State private var chatConversationId: String? = nil
     @State private var isLoadingUserPosts = false
+    @State private var showSavedItems = false
 
     // Modal seguidores/seguidos/amigos (estilo Insta)
     @State private var followListKind: FollowListKind? = nil
@@ -223,6 +224,10 @@ struct UserProfileView: View {
         .sheet(isPresented: $showGroupSheet) {
             MyGroupView()
         }
+        .sheet(isPresented: $showSavedItems) {
+            FavoritesView()
+                .environmentObject(authManager)
+        }
         .sheet(isPresented: $showChatSheet) {
             if let convId = chatConversationId {
                 NavigationStack {
@@ -297,6 +302,9 @@ struct UserProfileView: View {
                     }
                     Button(action: { showingEditProfile = true }) {
                         Label("Editar Perfil", systemImage: "pencil")
+                    }
+                    Button(action: { showSavedItems = true }) {
+                        Label("Guardados", systemImage: "bookmark.fill")
                     }
                 } else {
                     Button(role: .destructive, action: { showReportAlert = true }) {
