@@ -453,6 +453,23 @@ struct ModernOnboardingFlow: View {
                     .multilineTextAlignment(.center)
             }
 
+            #if targetEnvironment(simulator)
+            // Pista discreta para devs: en simulator hay que usar números de prueba
+            VStack(spacing: 4) {
+                HStack(spacing: 4) {
+                    Image(systemName: "info.circle.fill")
+                    Text("Simulador detectado")
+                }
+                .font(.caption2).fontWeight(.semibold)
+                .foregroundColor(.blue)
+                Text("Configura un número de prueba en Firebase Console y úsalo aquí. En device real funciona normal.")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 24)
+            #endif
+
             HStack(spacing: 16) {
                 if phoneCooldown > 0 {
                     Text("Reenviar en \(phoneCooldown)s")
@@ -526,8 +543,22 @@ struct ModernOnboardingFlow: View {
             return "El código no coincide. Revisa el SMS y vuelve a intentar."
         case AuthErrorCode.sessionExpired.rawValue:
             return "El código ha caducado. Pide uno nuevo."
+        case AuthErrorCode.missingAppToken.rawValue,
+             AuthErrorCode.notificationNotForwarded.rawValue,
+             AuthErrorCode.appNotVerified.rawValue:
+            // Errores típicos del simulator o cuando no llega APNS
+            #if targetEnvironment(simulator)
+            return "Estás en el simulador. Configura un número de prueba en Firebase Console (Authentication › Settings › Phone numbers for testing) y úsalo aquí."
+            #else
+            return "No pudimos verificar el dispositivo. Comprueba tu conexión y vuelve a intentar."
+            #endif
         default:
-            return ns.localizedDescription
+            // Si llega un texto técnico crudo, devolvemos algo genérico
+            let raw = ns.localizedDescription
+            if raw.contains("swizzling") || raw.contains("UIApplicationDelegate") {
+                return "No se pudo verificar el dispositivo. Intenta de nuevo o usa otro número."
+            }
+            return raw
         }
     }
 

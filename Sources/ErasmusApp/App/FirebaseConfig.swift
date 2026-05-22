@@ -1,6 +1,7 @@
 import Foundation
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseAuth
 
 // MARK: - Firebase Configuration
 struct FirebaseConfig {
@@ -17,6 +18,15 @@ struct FirebaseConfig {
         let settings = FirestoreSettings()
         settings.cacheSettings = PersistentCacheSettings(sizeBytes: NSNumber(value: 100 * 1024 * 1024)) // 100 MB
         Firestore.firestore().settings = settings
+
+        // En simulator desactivamos la verificación del dispositivo para Phone Auth.
+        // Esto exige usar números de prueba configurados en Firebase Console
+        // (Authentication > Settings > Phone numbers for testing).
+        // En device real (DEBUG y RELEASE) la verificación silenciosa funciona normalmente.
+        #if targetEnvironment(simulator)
+        Auth.auth().settings?.isAppVerificationDisabledForTesting = true
+        print("📱 Simulator detectado: usar números de prueba para Phone Auth")
+        #endif
 
         print("🔥 Firebase configurado con persistencia offline (cache 100 MB)")
     }
