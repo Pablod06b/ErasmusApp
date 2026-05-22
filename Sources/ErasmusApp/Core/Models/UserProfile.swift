@@ -46,6 +46,10 @@ struct UserProfile: Codable, Identifiable {
     // Opcional para compatibilidad con perfiles antiguos sin este campo
     var blockedUserIds: [String]?
 
+    // Teléfono en formato internacional (ej. "+34612345678"). Opcional para compat
+    // con perfiles existentes; nuevo flujo de registro lo requiere y verifica por SMS.
+    var phoneNumber: String?
+
     // Origin country/city
     var originCountry: String
     var originCity: String

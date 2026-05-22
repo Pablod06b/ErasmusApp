@@ -1,6 +1,7 @@
 import SwiftUI
 import PhotosUI
 import UserNotifications
+import FirebaseAuth
 
 
 struct ModernOnboardingFlow: View {
@@ -16,6 +17,15 @@ struct ModernOnboardingFlow: View {
     @State private var password: String = ""
     @State private var username: String = ""
     @State private var showPassword: Bool = false
+
+    // Teléfono
+    @State private var phonePrefix: String = "+34"
+    @State private var phoneNumber: String = ""
+    @State private var otpCode: String = ""
+    @State private var phoneVerificationError: String? = nil
+    @State private var phoneCooldown: Int = 0     // segundos restantes para reenviar
+    @State private var didSendInitialSMS: Bool = false
+    @StateObject private var phoneAuth = PhoneAuthManager.shared
     
     // Universidad y estudios
     @State private var universidadBusqueda: String = ""
@@ -156,6 +166,8 @@ struct ModernOnboardingFlow: View {
                 switch currentStep {
                 case .registro1:
                     AnyView(registro1View)
+                case .verificacionTelefono:
+                    AnyView(verificacionTelefonoView)
                 case .fotoPerfil:
                     AnyView(fotoPerfilView)
                 case .universidad:
@@ -258,86 +270,275 @@ struct ModernOnboardingFlow: View {
     }
     
     // MARK: - Screen Views
+
+    /// Registro paso 1 — diseño pulido con gradientes, vidrio y validación en vivo.
     private var registro1View: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 18) {
+            // Hero decorativo
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [.blue.opacity(0.7), .purple.opacity(0.7)],
+                            startPoint: .topLeading, endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 88, height: 88)
+                    .blur(radius: 24)
+                Image(systemName: "graduationcap.fill")
+                    .font(.system(size: 38, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 78, height: 78)
+                    .background(
+                        LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .shadow(color: .blue.opacity(0.4), radius: 16, x: 0, y: 6)
+            }
+            .padding(.bottom, 6)
+
             ModernInputField(
                 title: "Nombre y apellidos",
-                placeholder: "Tu nombre completo",
+                placeholder: "Pablo Domínguez",
                 text: $nombre,
-                icon: "👤"
+                icon: "👤",
+                validation: { !$0.trimmingCharacters(in: .whitespaces).isEmpty },
+                errorMessage: "Necesitamos un nombre para tu perfil",
+                autocapitalization: .words
             )
-            
-            VStack(alignment: .leading, spacing: 8) {
-                ModernInputField(
-                    title: "Email",
-                    placeholder: "tucorreo@ejemplo.com",
-                    text: $email,
-                    icon: "📧",
-                    keyboardType: .emailAddress
-                )
-                
-                if !emailError.isEmpty {
-                    Text(emailError)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .transition(.opacity)
-                }
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                ModernSecureField(
-                    title: "Contraseña",
-                    placeholder: "Mínimo 6 caracteres, 1 mayúscula, 1 número",
-                    text: $password,
-                    showPassword: $showPassword,
-                    icon: "🔒"
-                )
-                
-                // Password validation indicators
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 8) {
-                        Image(systemName: password.count >= 6 ? "checkmark.circle.fill" : "xmark.circle.fill")
-                            .foregroundColor(password.count >= 6 ? .green : .red)
-                            .font(.caption)
-                        Text("Mínimo 6 caracteres")
-                            .font(.caption)
-                            .foregroundColor(password.count >= 6 ? .green : .secondary)
-                    }
-                    
-                    HStack(spacing: 8) {
-                        Image(systemName: password.rangeOfCharacter(from: CharacterSet.uppercaseLetters) != nil ? "checkmark.circle.fill" : "xmark.circle.fill")
-                            .foregroundColor(password.rangeOfCharacter(from: CharacterSet.uppercaseLetters) != nil ? .green : .red)
-                            .font(.caption)
-                        Text("Al menos 1 mayúscula")
-                            .font(.caption)
-                            .foregroundColor(password.rangeOfCharacter(from: CharacterSet.uppercaseLetters) != nil ? .green : .secondary)
-                    }
-                    
-                    HStack(spacing: 8) {
-                        Image(systemName: password.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil ? "checkmark.circle.fill" : "xmark.circle.fill")
-                            .foregroundColor(password.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil ? .green : .red)
-                            .font(.caption)
-                        Text("Al menos 1 número")
-                            .font(.caption)
-                            .foregroundColor(password.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil ? .green : .secondary)
-                    }
-                }
-                .padding(.top, 4)
-                
-                if !passwordError.isEmpty {
-                    Text(passwordError)
-                        .font(.caption)
-                        .foregroundColor(.red)
-                        .transition(.opacity)
-                }
-            }
-            
+
+            ModernInputField(
+                title: "Email",
+                placeholder: "tu@email.com",
+                text: $email,
+                icon: "📧",
+                keyboardType: .emailAddress,
+                validation: { isValidEmail($0) && !isDisposableEmail($0) },
+                errorMessage: "Email no válido o de un proveedor temporal"
+            )
+
             ModernInputField(
                 title: "Nombre de usuario",
-                placeholder: "@usuario",
+                placeholder: "@pablo",
                 text: $username,
-                icon: "👤"
+                icon: "@",
+                validation: { isValidUsername($0) },
+                errorMessage: "Mínimo 3 caracteres, sólo letras/números/_/."
             )
+
+            ModernPhoneField(
+                title: "Teléfono",
+                prefix: $phonePrefix,
+                phone: $phoneNumber,
+                validation: { $0.count >= 6 && $0.count <= 15 },
+                errorMessage: "Introduce un número válido"
+            )
+
+            ModernSecureField(
+                title: "Contraseña",
+                placeholder: "Mínimo 6, una mayúscula y un número",
+                text: $password,
+                showPassword: $showPassword,
+                icon: "🔒",
+                validation: { isValidPassword($0) },
+                errorMessage: "Mínimo 6 caracteres, 1 mayúscula, 1 número"
+            )
+
+            // Indicador de fortaleza compacto
+            passwordStrengthBar
+                .padding(.top, 2)
+
+            // Mensaje legal pequeño
+            Text("Al continuar aceptas los Términos y la Política de Privacidad. Te enviaremos un email y un SMS para verificar tu cuenta.")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 8)
+                .padding(.top, 8)
+        }
+    }
+
+    /// Barra horizontal compacta de fortaleza de contraseña.
+    private var passwordStrengthBar: some View {
+        let score = passwordScore(password)
+        let (label, color): (String, Color) = {
+            switch score {
+            case 0: return ("Vacía", .gray)
+            case 1: return ("Débil", .red)
+            case 2: return ("Mejorable", .orange)
+            case 3: return ("Buena", .yellow)
+            default: return ("Fuerte", .green)
+            }
+        }()
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) {
+                ForEach(0..<4, id: \.self) { i in
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(i < score ? color : Color.gray.opacity(0.25))
+                        .frame(height: 4)
+                        .animation(.easeOut(duration: 0.2), value: score)
+                }
+            }
+            HStack {
+                Text("Seguridad: ")
+                    .font(.caption2).foregroundColor(.secondary)
+                Text(label)
+                    .font(.caption2).fontWeight(.semibold)
+                    .foregroundColor(color)
+                Spacer()
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private func passwordScore(_ pwd: String) -> Int {
+        var score = 0
+        if pwd.count >= 6 { score += 1 }
+        if pwd.rangeOfCharacter(from: .uppercaseLetters) != nil { score += 1 }
+        if pwd.rangeOfCharacter(from: .decimalDigits) != nil { score += 1 }
+        if pwd.count >= 10 || pwd.rangeOfCharacter(from: CharacterSet(charactersIn: "!@#$%^&*()_+-=[]{}|;:,.<>?")) != nil { score += 1 }
+        return score
+    }
+
+    private func isValidUsername(_ s: String) -> Bool {
+        guard s.count >= 3 else { return false }
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "._"))
+        return s.unicodeScalars.allSatisfy { allowed.contains($0) }
+    }
+
+    /// Bloquea dominios desechables conocidos.
+    private func isDisposableEmail(_ email: String) -> Bool {
+        let lower = email.lowercased()
+        let disposable = [
+            "tempmail", "guerrillamail", "10minutemail", "mailinator",
+            "yopmail", "throwaway", "trashmail", "fake", "getairmail",
+            "dispostable", "sharklasers", "spam4.me", "maildrop"
+        ]
+        return disposable.contains { lower.contains($0) }
+    }
+
+    // MARK: - Verificación de teléfono (paso nuevo entre registro1 y fotoPerfil)
+    private var verificacionTelefonoView: some View {
+        VStack(spacing: 24) {
+            // Icono
+            ZStack {
+                Circle()
+                    .fill(LinearGradient(colors: [.blue.opacity(0.7), .purple.opacity(0.7)],
+                                         startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: 88, height: 88).blur(radius: 24)
+                Image(systemName: "message.fill")
+                    .font(.system(size: 38, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 78, height: 78)
+                    .background(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .shadow(color: .blue.opacity(0.4), radius: 16, x: 0, y: 6)
+            }
+
+            VStack(spacing: 6) {
+                Text("Te hemos enviado un código a")
+                    .font(.subheadline).foregroundColor(.secondary)
+                Text("\(phonePrefix) \(phoneNumber)")
+                    .font(.title3).fontWeight(.bold)
+            }
+
+            OTPField(code: $otpCode, length: 6)
+                .padding(.vertical, 8)
+
+            if let error = phoneVerificationError {
+                Label(error, systemImage: "exclamationmark.triangle.fill")
+                    .font(.footnote)
+                    .foregroundColor(.red)
+                    .padding(.horizontal, 8)
+                    .multilineTextAlignment(.center)
+            }
+
+            HStack(spacing: 16) {
+                if phoneCooldown > 0 {
+                    Text("Reenviar en \(phoneCooldown)s")
+                        .font(.footnote).foregroundColor(.secondary)
+                } else {
+                    Button("Reenviar código") {
+                        Task { await resendSMS() }
+                    }
+                    .font(.footnote.weight(.semibold))
+                    .foregroundColor(.blue)
+                }
+                Text("·").foregroundColor(.secondary)
+                Button("Cambiar número") {
+                    withAnimation { currentStep = .registro1 }
+                }
+                .font(.footnote.weight(.semibold))
+                .foregroundColor(.secondary)
+            }
+
+            if phoneAuth.isVerifying {
+                ProgressView("Verificando...").padding(.top, 6)
+            }
+        }
+        .task {
+            // La primera vez que se llega a este paso, enviamos el SMS automáticamente
+            if !didSendInitialSMS {
+                didSendInitialSMS = true
+                await sendInitialSMS()
+            }
+        }
+    }
+
+    /// Envía el primer SMS de verificación al llegar a este paso.
+    private func sendInitialSMS() async {
+        phoneVerificationError = nil
+        let fullNumber = "\(phonePrefix)\(phoneNumber)"
+        do {
+            _ = try await phoneAuth.sendCode(to: fullNumber)
+            startResendCooldown()
+        } catch {
+            phoneVerificationError = friendlyPhoneError(error)
+        }
+    }
+
+    private func resendSMS() async {
+        guard phoneCooldown == 0 else { return }
+        otpCode = ""
+        await sendInitialSMS()
+    }
+
+    private func startResendCooldown() {
+        phoneCooldown = 60
+        Task {
+            while phoneCooldown > 0 {
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                await MainActor.run { phoneCooldown -= 1 }
+            }
+        }
+    }
+
+    private func friendlyPhoneError(_ error: Error) -> String {
+        let ns = error as NSError
+        switch ns.code {
+        case AuthErrorCode.invalidPhoneNumber.rawValue:
+            return "El número no es válido. Revísalo y vuelve a intentar."
+        case AuthErrorCode.tooManyRequests.rawValue:
+            return "Demasiados intentos. Espera unos minutos."
+        case AuthErrorCode.quotaExceeded.rawValue:
+            return "Servicio temporalmente no disponible. Inténtalo más tarde."
+        case AuthErrorCode.invalidVerificationCode.rawValue:
+            return "El código no coincide. Revisa el SMS y vuelve a intentar."
+        case AuthErrorCode.sessionExpired.rawValue:
+            return "El código ha caducado. Pide uno nuevo."
+        default:
+            return ns.localizedDescription
+        }
+    }
+
+    /// Comprueba que tenemos un OTP de 6 dígitos y avanza. La validación real
+    /// (link con Firebase Auth) ocurre en submitRegistration usando la credential
+    /// construida con (verificationID, otpCode).
+    private func verifyPhoneCode() async {
+        guard otpCode.count == 6, phoneAuth.verificationID != nil else { return }
+        phoneVerificationError = nil
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+            currentStep = currentStep.next
         }
     }
     
@@ -808,17 +1009,22 @@ struct ModernOnboardingFlow: View {
 
     private func goNext() {
         guard canContinue else { return }
-        
+
         if currentStep == .completado {
             onFinish()
             return
         }
-        
+
+        if currentStep == .verificacionTelefono {
+            Task { await verifyPhoneCode() }
+            return
+        }
+
         if currentStep == .permisos {
             currentStep = .verificacion
             return
         }
-        
+
         if currentStep == .verificacion {
             submitRegistration()
             return
@@ -874,7 +1080,32 @@ struct ModernOnboardingFlow: View {
                 fmt.locale = Locale(identifier: "es_ES")
                 fmt.dateFormat = "MMM yyyy"
                 let formattedStart = fmt.string(from: fechaInicioErasmus).capitalized
-                try? await authManager.updateUserProfile(data: ["erasmusStartDate": formattedStart])
+                let fullPhone = "\(phonePrefix)\(phoneNumber)"
+                try? await authManager.updateUserProfile(data: [
+                    "erasmusStartDate": formattedStart,
+                    "phoneNumber": fullPhone
+                ])
+
+                // Vincular el teléfono al usuario actual con la credential SMS
+                // (si la verificación caducó, el usuario verá un error y podrá repetir desde Ajustes)
+                if !otpCode.isEmpty, phoneAuth.verificationID != nil {
+                    do {
+                        try await phoneAuth.link(code: otpCode)
+                    } catch {
+                        print("No se pudo vincular el teléfono: \(error)")
+                        await MainActor.run {
+                            AppErrorManager.shared.report(
+                                "El código SMS caducó. Puedes verificar el teléfono más tarde desde Ajustes.",
+                                icon: "phone.badge.waveform"
+                            )
+                        }
+                    }
+                }
+
+                // Enviar email de verificación (asíncrono, no bloquea el onboarding)
+                Task {
+                    try? await authManager.sendEmailVerification()
+                }
                 
                 // Upload profile image safely to Firebase Storage
                 #if canImport(UIKit)
@@ -927,7 +1158,15 @@ struct ModernOnboardingFlow: View {
         switch currentStep {
         case .registro1:
             validateFields()
-            return !nombre.isEmpty && isValidEmail(email) && isValidPassword(password) && !username.isEmpty
+            return !nombre.trimmingCharacters(in: .whitespaces).isEmpty
+                && isValidEmail(email)
+                && !isDisposableEmail(email)
+                && isValidPassword(password)
+                && isValidUsername(username)
+                && phoneNumber.count >= 6
+                && phoneNumber.count <= 15
+        case .verificacionTelefono:
+            return otpCode.count == 6
         case .fotoPerfil:
             return true // Optional step
         case .universidad:
@@ -1242,11 +1481,12 @@ struct ImagePicker: UIViewControllerRepresentable {
 
 // MARK: - Models
 enum OnboardingStep: Int, CaseIterable {
-    case registro1 = 0, fotoPerfil, universidad, estado, destinoA, destinoB, idiomas, grupos, permisos, verificacion, completado
+    case registro1 = 0, verificacionTelefono, fotoPerfil, universidad, estado, destinoA, destinoB, idiomas, grupos, permisos, verificacion, completado
     
     var title: String {
         switch self {
         case .registro1: return "Crea tu cuenta"
+        case .verificacionTelefono: return "Verifica tu teléfono"
         case .fotoPerfil: return "Foto de perfil"
         case .universidad: return "Tu perfil académico"
         case .estado: return "¿En qué punto estás con tu Erasmus?"
@@ -1263,6 +1503,7 @@ enum OnboardingStep: Int, CaseIterable {
     var subtitle: String? {
         switch self {
         case .registro1: return "Completa tus datos básicos"
+        case .verificacionTelefono: return "Te enviamos un código por SMS"
         case .fotoPerfil: return "Añade una foto para que te reconozcan"
         case .universidad: return "Elige tu universidad y carrera"
         case .estado: return "Podrás actualizarlo en cualquier momento"
@@ -1278,6 +1519,7 @@ enum OnboardingStep: Int, CaseIterable {
     
     var buttonText: String {
         switch self {
+        case .verificacionTelefono: return "Verificar código"
         case .permisos: return "Aceptar y continuar"
         case .verificacion: return "Verificar cuenta"
         case .completado: return "¡Vamos allá!"

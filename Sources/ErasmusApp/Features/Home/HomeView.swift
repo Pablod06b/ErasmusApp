@@ -103,6 +103,9 @@ struct HomeView: View {
                     posts: $postManager.posts
                 )
 
+                VerifyEmailBanner()
+                    .environmentObject(authManager)
+
                 ZStack(alignment: .bottomTrailing) {
                     Group {
                         switch selectedTab {

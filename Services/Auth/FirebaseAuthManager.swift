@@ -12,6 +12,7 @@ class FirebaseAuthManager: ObservableObject {
     @Published var isAuthenticated = false
     @Published var isLoading = false
     @Published var authError: AuthError?
+    @Published var isEmailVerified: Bool = false
     
     private let db = Firestore.firestore()
     
@@ -248,6 +249,8 @@ class FirebaseAuthManager: ObservableObject {
             if document.exists {
                 self.currentUser = try document.data(as: UserProfile.self)
                 self.isAuthenticated = true
+                // Estado de verificación de email
+                self.isEmailVerified = Auth.auth().currentUser?.isEmailVerified ?? false
                 // Sincroniza set de bloqueados para filtros instantáneos
                 await SocialManager.shared.loadBlockedUsers()
                 // Carga favoritos para que los botones bookmark muestren el estado real
@@ -303,6 +306,31 @@ class FirebaseAuthManager: ObservableObject {
             return .networkError
         default:
             return .unknownError(error.localizedDescription)
+        }
+    }
+
+    // MARK: - Email Verification
+
+    /// Envía un email con enlace de verificación al usuario actual.
+    func sendEmailVerification() async throws {
+        guard let user = Auth.auth().currentUser else {
+            throw AuthError.unknownError("No hay sesión activa")
+        }
+        try await user.sendEmailVerification()
+    }
+
+    /// Refresca el estado de Firebase Auth para comprobar si el usuario
+    /// ha verificado el email (haciendo click en el enlace del correo).
+    @discardableResult
+    func refreshEmailVerification() async -> Bool {
+        guard let user = Auth.auth().currentUser else { return false }
+        do {
+            try await user.reload()
+            let verified = user.isEmailVerified
+            self.isEmailVerified = verified
+            return verified
+        } catch {
+            return false
         }
     }
 }
