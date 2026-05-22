@@ -17,7 +17,41 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // Mensajería (FCM)
         Messaging.messaging().apnsToken = deviceToken
+        // Firebase Auth — necesita el APNS token para Phone Auth (verificación silenciosa)
+        #if DEBUG
+        Auth.auth().setAPNSToken(deviceToken, type: .sandbox)
+        #else
+        Auth.auth().setAPNSToken(deviceToken, type: .prod)
+        #endif
+    }
+
+    func application(_ application: UIApplication,
+                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("APNS register error: \(error.localizedDescription)")
+    }
+
+    // Reenvía silent push notifications a Firebase Auth (Phone Auth las usa para
+    // verificar el dispositivo sin reCAPTCHA visible). Si Auth no la consume,
+    // la procesamos normalmente.
+    func application(_ application: UIApplication,
+                     didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        if Auth.auth().canHandleNotification(userInfo) {
+            completionHandler(.noData)
+            return
+        }
+        // FCM también gestiona algunas; dejamos que Messaging las vea
+        completionHandler(.newData)
+    }
+
+    // Necesario para que Auth procese el callback del reCAPTCHA si cae en él
+    func application(_ application: UIApplication,
+                     open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        if Auth.auth().canHandle(url) { return true }
+        return false
     }
 
     // Save FCM token to Firestore so we can send push notifications to this device
